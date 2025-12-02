@@ -288,3 +288,4 @@ All derivative works must remain open.
 
 
 **See also:** [CLPSR Addendum](CLPSR_Addendum.md)
+**See also:** [Bidirectional I/O Addendum](TwoSided_I-O_Addendum.md)
