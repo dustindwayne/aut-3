@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AUT-3 Documentation</title>
+  <title>AUT-3 — Volumetric Photonic Compute–Memory Architecture</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <style>
     :root {
@@ -19,20 +18,19 @@
       --radius-lg: 18px;
       --radius-md: 10px;
       --shadow: 0 18px 40px rgba(15,23,42,0.12);
-      --transition: 140ms ease-out;
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
         --bg: #020617;
         --panel-bg: #020617;
-        --border-subtle: #1f2933;
+        --border-subtle: #1f2937;
         --border-strong: #111827;
         --text: #e5e7eb;
         --text-muted: #9ca3af;
         --accent: #38bdf8;
         --accent-soft: rgba(56,189,248,0.14);
-        --shadow: 0 26px 60px rgba(15,23,42,0.95);
+        --shadow: 0 26px 60px rgba(15,23,42,0.9);
       }
     }
 
@@ -45,8 +43,8 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
         "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(56,189,248,0.12), transparent 60%),
-        radial-gradient(circle at bottom right, rgba(37,99,235,0.12), transparent 60%),
+        radial-gradient(circle at top left, rgba(56,189,248,0.14), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(37,99,235,0.14), transparent 60%),
         var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -58,373 +56,420 @@
 
     .shell {
       width: 100%;
-      max-width: 1200px;
+      max-width: 1120px;
       background: var(--panel-bg);
       border-radius: 24px;
       border: 1px solid var(--border-subtle);
       box-shadow: var(--shadow);
-      display: grid;
-      grid-template-columns: 260px minmax(0, 1fr);
-      overflow: hidden;
-    }
-
-    @media (max-width: 880px) {
-      .shell {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    .side {
-      background:
-        radial-gradient(circle at top, rgba(56,189,248,0.12), transparent 60%),
-        linear-gradient(180deg, #020617, #020617);
-      color: #e5e7eb;
-      padding: 18px 18px 20px;
+      padding: 20px 20px 22px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      border-right: 1px solid rgba(15,23,42,0.75);
+      gap: 16px;
     }
 
-    .side-header {
+    @media (max-width: 640px) {
+      body { padding: 10px; }
+      .shell { padding: 16px 14px 18px; }
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 10px;
+    }
+
+    .h-left {
+      max-width: 620px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
 
-    .side-label {
+    .label {
       font-size: 11px;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: #9ca3af;
+      color: var(--accent);
     }
 
-    .side-title {
-      font-size: 18px;
+    h1 {
+      margin: 0;
+      font-size: 24px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
-    .side-sub {
-      font-size: 12px;
-      color: #9ca3af;
+    .subtitle {
+      margin: 0;
+      font-size: 13px;
+      color: var(--text-muted);
     }
 
-    .side-section-title {
-      margin-top: 8px;
+    .h-right {
       font-size: 11px;
-      color: #9ca3af;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-    }
-
-    .nav {
-      margin: 4px 0 0;
-      padding: 0;
-      list-style: none;
+      color: var(--text-muted);
       display: flex;
       flex-direction: column;
       gap: 4px;
-      font-size: 13px;
+      align-items: flex-end;
     }
 
-    .nav-button {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 9px;
-      border-radius: 9px;
-      border: 1px solid transparent;
-      background: transparent;
-      color: #cbd5f5;
-      text-align: left;
-      cursor: pointer;
-      font: inherit;
-      transition: background var(--transition), border-color var(--transition), transform var(--transition);
-    }
-
-    body:not(.nohover) .nav-button:hover {
-      background: rgba(15,23,42,0.9);
-      border-color: rgba(148,163,184,0.6);
-      transform: translateX(1px);
-    }
-
-    .nav-button span {
-      pointer-events: none;
-    }
-
-    .nav-button small {
-      font-size: 10px;
-      opacity: 0.7;
-    }
-
-    .nav-button.active {
-      background: linear-gradient(90deg, var(--accent-soft), transparent);
-      border-color: var(--accent);
-      color: #e5e7eb;
-    }
-
-    .side-footer {
-      margin-top: auto;
-      font-size: 11px;
-      color: #9ca3af;
-      border-top: 1px solid rgba(15,23,42,0.85);
-      padding-top: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .side-footer a {
+    .h-right a {
       color: var(--accent);
       text-decoration: none;
     }
 
-    .main {
-      padding: 16px 18px 20px;
-      background: var(--panel-bg);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      overflow: auto;
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.9fr);
+      gap: 16px;
     }
 
-    @media (max-width: 640px) {
-      body {
-        padding: 8px;
-      }
-      .main {
-        padding: 14px 12px 18px;
+    @media (max-width: 880px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
       }
     }
 
-    .top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .crumbs a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    .file-tag {
-      padding: 3px 9px;
-      border-radius: 999px;
+    .side-panel {
+      border-radius: var(--radius-lg);
       border: 1px solid var(--border-subtle);
-      background: rgba(148,163,184,0.10);
-      font-size: 11px;
-    }
-
-    .status {
-      font-size: 12px;
+      padding: 12px 13px;
+      background:
+        radial-gradient(circle at top, var(--accent-soft), transparent 65%),
+        rgba(15,23,42,0.02);
+      font-size: 13px;
       color: var(--text-muted);
-      margin-bottom: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
-    .error {
-      color: #ef4444;
+    .side-panel h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin: 0 0 4px;
+      color: var(--text-muted);
     }
 
-    .doc {
+    .side-panel ul {
+      margin: 4px 0 0;
+      padding-left: 16px;
+    }
+
+    .side-panel li { margin-bottom: 3px; }
+
+    .side-panel a {
+      color: var(--accent);
+      text-decoration: none;
+      word-break: break-word;
+    }
+
+    .spec {
       border-radius: var(--radius-lg);
       border: 1px solid var(--border-strong);
+      padding: 14px 16px 18px;
       background:
         radial-gradient(circle at top, rgba(15,23,42,0.06), transparent 60%),
         rgba(255,255,255,0.96);
-      padding: 16px 18px 20px;
-      max-width: 920px;
-      margin: 0 auto;
-      line-height: 1.55;
       font-size: 14px;
+      line-height: 1.55;
+      max-height: calc(100vh - 170px);
+      overflow: auto;
     }
 
     @media (prefers-color-scheme: dark) {
-      .doc {
+      .spec {
         background:
-          radial-gradient(circle at top, rgba(56,189,248,0.14), transparent 60%),
+          radial-gradient(circle at top, rgba(56,189,248,0.18), transparent 60%),
           rgba(15,23,42,0.98);
       }
     }
 
-    .doc h1, .doc h2, .doc h3, .doc h4 {
-      margin-top: 18px;
+    .spec h2 {
+      font-size: 18px;
+      margin-top: 14px;
       margin-bottom: 8px;
     }
 
-    .doc h1 { font-size: 22px; }
-    .doc h2 { font-size: 18px; }
-    .doc h3 { font-size: 16px; }
-
-    .doc p {
-      margin: 8px 0;
+    .spec h3 {
+      font-size: 15px;
+      margin-top: 12px;
+      margin-bottom: 6px;
     }
 
-    .doc code {
+    .spec p {
+      margin: 6px 0;
+    }
+
+    .spec ul {
+      margin: 4px 0 8px;
+      padding-left: 18px;
+    }
+
+    .spec code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 12px;
-      background: rgba(15,23,42,0.06);
+      background: rgba(15,23,42,0.08);
       padding: 1px 4px;
       border-radius: 4px;
     }
 
-    .doc pre {
-      background: rgba(15,23,42,0.92);
-      color: #e5e7eb;
-      padding: 10px 12px;
-      border-radius: 10px;
-      overflow-x: auto;
-      font-size: 12px;
+    .spec strong {
+      font-weight: 600;
     }
 
-    .doc a {
-      color: var(--accent);
+    footer {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 6px;
     }
   </style>
 </head>
 <body>
   <div class="shell">
-    <aside class="side">
-      <div class="side-header">
-        <div class="side-label">AUT-3</div>
-        <div class="side-title">Docs</div>
-        <div class="side-sub">
-          Volumetric photonic compute–memory architecture. Choose a document to view the exact specification text rendered from the repo.
+    <header>
+      <div class="h-left">
+        <div class="label">AUT-3 / Volumetric Photonic Compute–Memory</div>
+        <h1>AUT-3</h1>
+        <p class="subtitle">
+          Unified 3D photonic compute–memory architecture. Storage, RAM, and compute are implemented as wavelength roles inside a single volumetric optical medium.
+        </p>
+      </div>
+      <div class="h-right">
+        <div>Inventor: <a href="https://github.com/dustindwayne">github.com/dustindwayne</a></div>
+        <div>Repo: <a href="https://github.com/dustindwayne/aut-3">dustindwayne/aut-3</a></div>
+        <div>License: CERN-OHL-S-2.0 (Strongly Reciprocal)</div>
+      </div>
+    </header>
+
+    <main>
+      <aside class="side-panel">
+        <h2>Documents in this repo</h2>
+        <div>
+          <strong>Core:</strong>
+          <ul>
+            <li><a href="https://github.com/dustindwayne/aut-3/blob/main/AUT3_Master_Specification.md">AUT3_Master_Specification.md</a></li>
+            <li><a href="https://github.com/dustindwayne/aut-3/blob/main/defensive-publication/AUT3_Defensive_Publication.md">AUT3_Defensive_Publication.md</a></li>
+            <li><a href="https://github.com/dustindwayne/aut-3/blob/main/defensive-publication/AUT3_Claims_Appendix.md">AUT3_Claims_Appendix.md</a></li>
+          </ul>
         </div>
-      </div>
-
-      <div class="side-section-title">Core</div>
-      <ul class="nav" id="nav-core"></ul>
-
-      <div class="side-section-title">Chapters</div>
-      <ul class="nav" id="nav-chapters"></ul>
-
-      <div class="side-footer">
-        <span>Source: <a href="https://github.com/dustindwayne/aut-3">github.com/dustindwayne/aut-3</a></span>
-        <span>Rendered client-side from Markdown.</span>
-      </div>
-    </aside>
-
-    <main class="main">
-      <div class="top">
-        <div class="crumbs">
-          <a href="#">AUT-3</a> · <span id="crumb-label">Master Specification</span>
+        <div>
+          <strong>Chapters (spec/):</strong>
+          <ul>
+            <li><a href="https://github.com/dustindwayne/aut-3/blob/main/spec/01_Architecture_Overview.md">01_Architecture_Overview.md</a></li>
+            <li><a href="https://github.com/dustindwayne/aut-3/blob/main/spec/03_State_Model.md">03_State_Model.md</a></li>
+            <li><a href="https://github.com/dustindwayne/aut-3/blob/main/spec/04_Compute_Model.md">04_Compute_Model.md</a></li>
+            <li><a href="https://github.com/dustindwayne/aut-3/blob/main/spec/05_Memory_Model.md">05_Memory_Model.md</a></li>
+            <li><a href="https://github.com/dustindwayne/aut-3/blob/main/spec/06_Control_Plane_and_Programming.md">06_Control_Plane_and_Programming.md</a></li>
+            <li><a href="https://github.com/dustindwayne/aut-3/blob/main/spec/07_Node_Mesh_and_Scaling.md">07_Node_Mesh_and_Scaling.md</a></li>
+            <li><a href="https://github.com/dustindwayne/aut-3/blob/main/spec/08_Fault_Tolerance_and_Reliability.md">08_Fault_Tolerance_and_Reliability.md</a></li>
+            <li><a href="https://github.com/dustindwayne/aut-3/blob/main/spec/09_Performance_and_Limits.md">09_Performance_and_Limits.md</a></li>
+            <li><a href="https://github.com/dustindwayne/aut-3/blob/main/spec/10_AI_Relevance_and_Use_Cases.md">10_AI_Relevance_and_Use_Cases.md</a></li>
+            <li><a href="https://github.com/dustindwayne/aut-3/blob/main/spec/11_Implementation_Notes.md">11_Implementation_Notes.md</a></li>
+            <li><a href="https://github.com/dustindwayne/aut-3/blob/main/spec/12_Glossary.md">12_Glossary.md</a></li>
+          </ul>
         </div>
-        <div id="file-label" class="file-tag"></div>
-      </div>
-      <div id="status" class="status">Loading…</div>
-      <article id="content" class="doc"></article>
+        <div>
+          This page inlines the full Master Specification for fast reading.  
+          All other documents are accessible directly on GitHub via the links above.
+        </div>
+      </aside>
+
+      <section class="spec">
+        <h2>AUT-3 Master Specification</h2>
+        <p><strong>Volumetric Photonic Compute–Memory Architecture</strong></p>
+
+        <p>
+          AUT-3 replaces the traditional CPU / GPU / RAM / cache / storage stack with a single
+          volumetric photonic compute–memory medium. All actual computation and data storage occur
+          optically inside the medium. The electronic layer is a minimal control shell only.
+        </p>
+
+        <h3>1. Architectural Overview</h3>
+        <p>
+          The AUT-3 node consists of:
+        </p>
+        <ul>
+          <li>A 3D optical medium subdivided conceptually into voxels.</li>
+          <li>Multi-wavelength optical emitters that write and compute in the medium.</li>
+          <li>Sensor/readout mechanisms (tomographic or planar) to observe state.</li>
+          <li>A minimal digital shell for sequencing, calibration, and I/O.</li>
+        </ul>
+        <p>
+          AUT-3 is not a coprocessor. It is the entire compute–memory substrate. The legacy notion of separate CPU, GPU, RAM, VRAM, and SSD devices is removed.
+        </p>
+
+        <h3>2. State Model</h3>
+        <p>
+          The medium is modeled as a continuous 3D field but is referenced as a voxel grid:
+        </p>
+        <p>
+          <code>S(x, y, z) ∈ ℝ<sup>K</sup></code>
+        </p>
+        <p>
+          Each voxel’s state vector encodes wavelength-dependent properties such as absorption, phase, and nonlinear response. Functional roles are assigned by spectral bands using Dense Wavelength Division Multiplexing (DWDM):
+        </p>
+        <ul>
+          <li><strong>Red / Infrared:</strong> deep, stable storage.</li>
+          <li><strong>Green:</strong> working memory (RAM-equivalent).</li>
+          <li><strong>Blue / UV:</strong> shallow, nonlinear compute interaction.</li>
+        </ul>
+        <p>
+          Because each band is spectrally separated and chosen according to penetration depth, storage, RAM, and compute can coexist in the same physical volume without interfering.
+        </p>
+
+        <h3>3. Compute Model</h3>
+        <p>
+          Computation occurs when Blue/UV femtosecond pulses interact with the medium. These pulses:
+        </p>
+        <ul>
+          <li>Have duration &lt; 100 fs.</li>
+          <li>Operate in a regime where nonlinear optical effects dominate.</li>
+          <li>Deliver energy faster than the lattice relaxation time, avoiding thermal blooming.</li>
+        </ul>
+        <p>
+          Compute operations are defined as optical field transformations over regions:
+        </p>
+        <p>
+          <code>S′(x, y, z) = F(S(x, y, z), λ, t, I, φ)</code>
+        </p>
+        <p>
+          where <code>λ</code> is wavelength, <code>t</code> is pulse timing, <code>I</code> is intensity, and <code>φ</code> defines the spatial field profile. Matrix and tensor operations (including convolutions) are mapped to these region-wide field interactions. All voxels in an illuminated region update effectively in parallel, replacing discrete ALU/Tensor Core concepts.
+        </p>
+
+        <h3>4. Memory Model</h3>
+        <p>
+          Memory is not a separate device. It is the same medium, partitioned by wavelength:
+        </p>
+        <ul>
+          <li><strong>Red/IR:</strong> long-lived storage (OS, model weights, persistent state).</li>
+          <li><strong>Green:</strong> fast rewrite working memory (variables, activations).</li>
+          <li><strong>Blue/UV:</strong> transient compute states (equivalent to registers/cache).</li>
+        </ul>
+        <p>
+          There is no concept of “memory bandwidth” in the classical sense because data does not move between compute and memory. Compute operates directly on the in-place state.
+        </p>
+
+        <h3>5. Control Plane</h3>
+        <p>
+          The digital control shell does not compute workloads. It:
+        </p>
+        <ul>
+          <li>Sequences optical operations (pulses, patterns, regions).</li>
+          <li>Configures DWDM channels.</li>
+          <li>Handles calibration and I/O.</li>
+          <li>Maintains wavelength-locking feedback loops.</li>
+        </ul>
+        <p>
+          <strong>Closed-Loop Wavelength Locking:</strong> thermal or structural drift shifts the effective refractive index, which in turn shifts absorption peaks. The system monitors this and retunes emitter wavelengths by the same offset, so each band continues to address the correct logical depth and function.
+        </p>
+
+        <h3>6. Optional Z-Gating Variant</h3>
+        <p>
+          Although DWDM can be sufficient by itself, AUT-3 optionally includes Z-selective gating layers:
+        </p>
+        <ul>
+          <li>Electro-optic shutters or films that can be switched transparent/opaque.</li>
+          <li>Physical separators that can be replaced if damaged.</li>
+          <li>Depth windows for safe-mode write and compute operations.</li>
+        </ul>
+        <p>
+          This provides an extra degree of safety and fault isolation, especially under aggressive compute loads or in safety-critical deployments.
+        </p>
+
+        <h3>7. Node Mesh and Scaling</h3>
+        <p>
+          A single AUT-3 node can be used stand-alone or as part of a mesh:
+        </p>
+        <ul>
+          <li>Nodes are linked optically or electrically.</li>
+          <li>DWDM channel allocations are kept consistent across nodes.</li>
+          <li>Compute can be partitioned or distributed across the mesh.</li>
+        </ul>
+        <p>
+          Scaling increases both compute capacity and memory capacity simultaneously, because they are the same physical resource.
+        </p>
+
+        <h3>8. Fault Tolerance</h3>
+        <p>
+          AUT-3 uses:
+        </p>
+        <ul>
+          <li>Spectral separation to prevent cross-band corruption.</li>
+          <li>Voxel-level and regional redundancy (remapping, spare regions).</li>
+          <li>Node replication in multi-node meshes.</li>
+          <li>Closed-loop wavelength-locking to avoid drift-induced errors.</li>
+          <li>Optional Z-gating to isolate damaged depth layers.</li>
+        </ul>
+
+        <h3>9. Performance and Limits</h3>
+        <p>
+          Performance is dominated by:
+        </p>
+        <ul>
+          <li>Pulse repetition rate.</li>
+          <li>Volume size and effective nonlinearity.</li>
+          <li>Tomographic or readout bandwidth.</li>
+          <li>Locking loop response time.</li>
+        </ul>
+        <p>
+          Compute latency is mostly independent of problem size within an illuminated region, because updates are volumetric and parallel. Thermal limits are controlled by the ultrafast pulse regime.
+        </p>
+
+        <h3>10. AI and Tensor Workloads</h3>
+        <p>
+          AUT-3 is directly suitable for AI:
+        </p>
+        <ul>
+          <li>Tensors map naturally into volumetric regions.</li>
+          <li>Weights can live in Red/IR or Green, activations in Green, and transients in Blue/UV.</li>
+          <li>Training and inference both benefit from in-place updates and volumetric parallelism.</li>
+        </ul>
+        <p>
+          GPUs, TPUs, and NPUs are replaced by this single photonic substrate; there is no separate “VRAM”.
+        </p>
+
+        <h3>11. Implementation Notes (High-Level)</h3>
+        <p>
+          At a high level, implementation requires:
+        </p>
+        <ul>
+          <li>A medium with appropriate nonlinear response and absorption spectra.</li>
+          <li>DWDM-capable sources with femtosecond pulse generation on the compute bands.</li>
+          <li>Tomographic or planar readout arrays with suitable bandwidth and SNR.</li>
+          <li>Thermal and mechanical stability sufficient for wavelength-locking.</li>
+        </ul>
+
+        <h3>12. Summary</h3>
+        <p>
+          AUT-3 defines a complete computing architecture where:
+        </p>
+        <ul>
+          <li>Compute and memory are the same physical volume.</li>
+          <li>Functional roles are defined by wavelength channels instead of devices.</li>
+          <li>Computation is volumetric, optical, and in-place.</li>
+          <li>Legacy CPU/GPU/RAM/SSD hierarchy disappears.</li>
+          <li>Defensive publication and open hardware licensing are used to keep the architecture open.</li>
+        </ul>
+      </section>
     </main>
+
+    <footer>
+      <span>This page is a static HTML view of the AUT-3 Master Specification.</span>
+      <span>All other documents are linked directly to their Markdown source in the repository.</span>
+    </footer>
   </div>
-
-  <script>
-    // soften hover on touch devices
-    if ('ontouchstart' in window) {
-      document.body.classList.add('nohover');
-    }
-
-    // documents mapping (file paths must match repo)
-    const docs = [
-      // Core
-      { id: "master", label: "Master Specification", file: "AUT3_Master_Specification.md", group: "core" },
-      { id: "pub", label: "Defensive Publication", file: "defensive-publication/AUT3_Defensive_Publication.md", group: "core" },
-      { id: "claims", label: "Claims Appendix", file: "defensive-publication/AUT3_Claims_Appendix.md", group: "core" },
-
-      // Chapters
-      { id: "arch", label: "Architecture Overview", file: "spec/01_Architecture_Overview.md", group: "chapters" },
-      { id: "state", label: "State Model", file: "spec/03_State_Model.md", group: "chapters" },
-      { id: "compute", label: "Compute Model", file: "spec/04_Compute_Model.md", group: "chapters" },
-      { id: "memory", label: "Memory Model", file: "spec/05_Memory_Model.md", group: "chapters" },
-      { id: "control", label: "Control Plane", file: "spec/06_Control_Plane_and_Programming.md", group: "chapters" },
-      { id: "mesh", label: "Node Mesh & Scaling", file: "spec/07_Node_Mesh_and_Scaling.md", group: "chapters" },
-      { id: "faults", label: "Fault Tolerance", file: "spec/08_Fault_Tolerance_and_Reliability.md", group: "chapters" },
-      { id: "perf", label: "Performance & Limits", file: "spec/09_Performance_and_Limits.md", group: "chapters" },
-      { id: "ai", label: "AI Relevance & Use Cases", file: "spec/10_AI_Relevance_and_Use_Cases.md", group: "chapters" },
-      { id: "impl", label: "Implementation Notes", file: "spec/11_Implementation_Notes.md", group: "chapters" },
-      { id: "gloss", label: "Glossary", file: "spec/12_Glossary.md", group: "chapters" },
-    ];
-
-    function getParam(name) {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(name);
-    }
-
-    // choose document by ?file=, fallback to master
-    const requestedFile = getParam('file');
-    const current = requestedFile
-      ? docs.find(d => d.file === requestedFile) || docs[0]
-      : docs[0];
-
-    const statusEl = document.getElementById('status');
-    const contentEl = document.getElementById('content');
-    const crumbLabel = document.getElementById('crumb-label');
-    const fileLabel = document.getElementById('file-label');
-
-    crumbLabel.textContent = current.label;
-    fileLabel.textContent = current.file;
-
-    function buildNav() {
-      const coreList = document.getElementById('nav-core');
-      const chapterList = document.getElementById('nav-chapters');
-      coreList.innerHTML = "";
-      chapterList.innerHTML = "";
-
-      docs.forEach(doc => {
-        const li = document.createElement('li');
-        const btn = document.createElement('button');
-        btn.type = "button";
-        btn.className = "nav-button" + (doc.file === current.file ? " active" : "");
-        btn.onclick = () => {
-          const basePath = window.location.pathname.split('/').slice(0, 2).join('/') + '/';
-          const target = window.location.origin + basePath + "docs/index.html?file=" + encodeURIComponent(doc.file);
-          window.location.href = target;
-        };
-
-        const left = document.createElement('span');
-        left.textContent = doc.label;
-        const right = document.createElement('small');
-        right.textContent = doc.group === "core" ? "core" : "chapter";
-
-        btn.appendChild(left);
-        btn.appendChild(right);
-        li.appendChild(btn);
-
-        if (doc.group === "core") {
-          coreList.appendChild(li);
-        } else {
-          chapterList.appendChild(li);
-        }
-      });
-    }
-
-    buildNav();
-
-    // compute project root path: "/aut-3/"
-    const pathParts = window.location.pathname.split('/'); // ["", "aut-3", "docs", "index.html"]
-    const projectRoot = pathParts.slice(0, 2).join('/') + '/'; // "/aut-3/"
-    const url = projectRoot + current.file;
-
-    statusEl.textContent = "Loading " + current.file + " …";
-
-    fetch(url)
-      .then(r => {
-        if (!r.ok) throw new Error("HTTP " + r.status + " for " + url);
-        return r.text();
-      })
-      .then(md => {
-        statusEl.textContent = "";
-        contentEl.innerHTML = marked.parse(md);
-      })
-      .catch(err => {
-        statusEl.innerHTML = "<span class='error'>Error loading document.</span>";
-        contentEl.innerHTML =
-          "<p>Failed to load:</p><pre>" + current.file + "</pre><p>" + err + "</p>";
-      });
-  </script>
 </body>
 </html>
