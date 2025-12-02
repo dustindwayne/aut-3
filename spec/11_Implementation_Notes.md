@@ -1,52 +1,127 @@
 # 11. Implementation Notes — AUT-3
 
-## 11.1 Candidate Media
+This document provides engineering details necessary for building AUT-3
+prototypes or research testbeds.
 
-Media must tolerate:
+---
 
-- High peak optical intensity
-- Minimal thermal expansion
-- Fast relaxation times
+## 11.1 Media Selection
 
-Candidates include photorefractive crystals, doped sol–gels, volumetric chalcogenides, etc.
+Media must exhibit:
+- nonlinear Blue/UV response
+- stable Red/IR transparency
+- suitable Green absorption
+- fast relaxation (< picoseconds)
+- compatibility with femtosecond pulses
 
-## 11.2 Ultrafast Optics Requirement (Femtosecond Regime)
+Materials include:
+- doped glasses
+- chalcogenides
+- photorefractive crystals
+- hybrid sol-gel composites
 
-AUT-3 requires emitter systems capable of operating in the **femtosecond pulse regime (<100 fs)**.
+---
 
-### Rationale
+## 11.2 Ultrafast Optics
 
-- Energy is delivered **faster than the lattice relaxation time**, avoiding:
-  - Thermal Blooming  
-  - Melt-induced rewrites  
-  - Irreversible refractive index deformation  
-- Compute pulses can perform nonlinear interactions without heating the bulk medium.
+Compute requires <100 fs pulses.
+This prevents:
+- thermal blooming
+- melting
+- refractive warping
 
-This requirement dramatically increases the stability of the storage channels while allowing high-intensity compute pulses.
+Pulse-shaping hardware must support:
+- dispersive compensation
+- phase filtering
+- intensity modulation
 
-## 11.3 Optical Subsystems
+---
 
-Emitters may include:
+## 11.3 Photodiode Read Arrays
 
-- Femtosecond fiber lasers
-- Ultrafast micro-LED stacks
-- Tunable DWDM-capable diode arrays
+Read subsystem must include:
+- multi-band photodiodes (APD/SPAD)
+- GHz–THz sampling
+- synchronization with the digital shell
+- low-noise preamplification
 
-Sensors must handle multi-band probe reconstruction.
+Tomographic reconstruction requires stable multi-angle captures.
 
-## 11.4 Control Electronics
+---
 
-Controllers track:
+## 11.4 DWDM Emitter Stack
 
-- Wavelength drift (for locking)
-- Pulse energy
-- Thermal envelope
+Emitters must:
+- be tunable by wavelength-locking feedback
+- support Red/Green/Blue/UV channels
+- maintain narrow linewidth stability
+- provide femtosecond pulse capability (for compute)
 
-## 11.5 Thermal Management
+---
 
-Cooling is secondary to active compensation.  
-Closed-loop wavelength locking handles refractive drift without the need for cryogenic or aggressive solutions.
+## 11.5 Z-Gating Hardware (Optional)
 
-## 11.6 Prototyping Notes
+Z-gating may use:
+- electrochromic films
+- liquid-crystal shutters
+- switchable refractive layers
+- replaceable separator membranes
 
-Prototyping may start with picosecond systems but long-term implementations must use femtosecond-capable lasers to avoid thermal deformation under repeated compute cycles.
+Z-gating is optional but useful for safety-critical systems.
+
+---
+
+## 11.6 Digital Shell Requirements
+
+Digital shell must:
+- coordinate pulses
+- collect readout
+- apply wavelength-locking corrections
+- manage I/O
+
+It is minimal and does not compute workloads.
+
+---
+
+## 11.7 Cooling
+
+Cooling is minimal due to femtosecond pulses, but:
+- passive cooling
+- heat spreaders
+- optical beam dumps
+
+may be necessary depending on pulse repetition rate.
+
+---
+
+## 11.8 Prototyping Stages
+
+Stage 1:
+- picosecond testbed
+- 2D sections of the volume
+
+Stage 2:
+- low-intensity DWDM mapping
+- 3D reconstruction tests
+
+Stage 3:
+- stable femtosecond compute
+
+Stage 4:
+- integrated node prototype
+
+Stage 5:
+- multi-node mesh
+
+---
+
+## 11.9 Summary
+
+Implementation is primarily:
+- optical engineering
+- materials science
+- tomography
+- DWDM control
+- ultrafast laser systems
+
+No electronic compute components are required.
