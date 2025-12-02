@@ -1,107 +1,151 @@
 # 4. Compute Model — AUT-3
 
-## 4.1 Overview
+AUT-3 performs computation through direct optical interactions within the
+volumetric medium. There are no ALUs, registers, shader cores, tensor cores, or
+execution units. Computation is achieved entirely through **optical field
+transformations applied to voxel state**.
 
-In AUT-3, computation is defined as **controlled transformations of voxel state** driven by **optical fields**.
+All compute occurs in-place.  
+No data movement.  
+No memory hierarchy.
 
-A single compute step can be expressed abstractly as:
+---
 
-- `S' = F(S, U)`
+## 4.1 Compute Wavelength (Blue/UV Band)
 
-where:
+The compute band uses high-energy Blue/UV wavelengths with:
 
-- `S` is the current volumetric state.
-- `U` describes one or more optical control fields (illumination patterns, wavelengths, timing).
-- `S'` is the updated state.
+- strong nonlinear interaction
+- shallow penetration depth
+- high sensitivity to femtosecond pulse shaping
+- wavelength-specific absorption
 
-Compute operations may:
+This provides the substrate for:
 
-- Transform state in-place.
-- Use intermediate optical fields that are not themselves stored.
-- Be applied to all voxels or restricted subregions.
+- tensor transforms  
+- convolution-like operations  
+- nonlinear activation behaviors  
+- vector field interactions  
 
-## 4.2 Optical Fields as Operators
+---
 
-Emitters and compute beams define **optical fields**:
+## 4.2 Femtosecond Compute Pulses (<100 fs)
 
-- Spatial distribution: intensity and phase over the volume.
-- Spectral content: single or multiple wavelengths.
-- Temporal profiles: pulse sequences, continuous waves, or modulated signals.
+All computational operations rely on ultrafast pulses:
 
-The medium responds according to its optical transfer function. Under linear and nonlinear optics, this can be approximated as:
+- < 100 fs duration  
+- fast enough to avoid thermal blooming  
+- energy delivered faster than lattice relaxation  
+- supports multi-photon and Kerr nonlinearities  
 
-- Linear propagation and scattering.
-- Nonlinear absorption and refractive index changes.
-- Phase accumulation.
+This ensures:
 
-At a given level of abstraction, a compute operation is modeled as applying a parameterized operator:
+- stable long-term storage  
+- minimal heat generation  
+- consistent compute function  
 
-- `S' = Op_theta(S)`
+---
 
-where:
+## 4.3 Compute as Field Transformation
 
-- `theta` encodes the configuration of emitters, beams, and timing.
+A compute instruction is defined as:
 
-## 4.3 Types of Compute Operations
+1. region selection  
+2. pulse configuration  
+3. wavelength selection  
+4. intensity and temporal pattern  
+5. repetition sequence  
 
-Examples of compute operations include:
+These parameters produce a **field transformation**:
 
-- **Local transforms**:
-  - Apply per-voxel functions (e.g., thresholding, scaling) via targeted illumination.
-- **Neighborhood operations**:
-  - Use optical propagation to mix information between neighboring voxels.
-- **Global transforms**:
-  - Use interference and propagation to implement approximations of convolutions, correlations, or transforms over regions.
+`S'(x, y, z) = F(S(x, y, z), λ, t, I, φ)`
 
-The architecture does not prescribe specific operations. It defines the general pattern:
+Where:
 
-1. Configure optical fields.
-2. Apply fields to the current state for a defined duration.
-3. Optionally read back the resulting state (full or partial).
-4. Optionally repeat with new configurations.
+- `S` is voxel state  
+- `λ` is wavelength  
+- `t` is pulse timing  
+- `I` is intensity  
+- `φ` is spatial field pattern  
 
-## 4.4 Sequential and Parallel Composition
+---
 
-Compute operations can be composed:
+## 4.4 Tensor and Matrix Operations
 
-- **Sequentially**:
-  - Apply `Op1`, then `Op2`, etc.
-- **In parallel**:
-  - Different regions or channels can be driven concurrently if hardware permits.
-  - Different wavelengths can interact with different channels simultaneously.
+Matrix multiplication, tensor contraction, and convolution are implemented as:
 
-The control plane ensures that:
+- structured illumination patterns  
+- phase-modulated wavefronts  
+- region-wide nonlinear interactions  
 
-- Dependencies between operations are respected.
-- Regions are not unintentionally overwritten by overlapping operations.
+All voxels in a region update simultaneously.
 
-## 4.5 Conditional Behavior
+This replaces GPU tensor cores.
 
-Conditional computation is implemented by:
+---
 
-- Reading selected state components from sensors.
-- Evaluating conditions in control electronics or higher-level controllers.
-- Choosing subsequent optical operations based on those conditions.
+## 4.5 Logical Operations
 
-At a higher abstraction level, this allows:
+Logical branching is implemented through:
 
-- Branching control flow.
-- Early stopping in iterative algorithms.
-- Data-dependent activation of specific compute patterns.
+- conditional field exposure  
+- gating via refractive-index state  
+- selective region illumination  
+- wavelength-mode masking  
 
-Conditionals operate at the control level. The underlying medium remains continuous and analog.
+There is no program counter.  
+Control flow is a sequence of optical events.
 
-## 4.6 Precision and Approximation
+---
 
-AUT-3 is inherently analog:
+## 4.6 Compute–Memory Unification
 
-- State components are continuous values.
-- Optical transformations involve noise and approximation.
+There is no separation between compute and memory:
 
-Higher-level algorithms must be expressed to tolerate:
+- Blue/UV performs compute  
+- Green holds variable state  
+- Red/IR holds static data  
 
-- Limited precision.
-- Reconstruction noise.
-- Drift corrections.
+All coexist in the same volumetric field.
 
-Where needed, digital error-correction can be applied around AUT-3 operations, but the core compute fabric is modeled as continuous rather than bit-precise.
+Compute occurs **on** memory.  
+Memory is **in place** during compute.
+
+---
+
+## 4.7 Z-Gating Interaction (Optional)
+
+For safety or redundancy:
+
+- Z-gating layers can inhibit compute-field penetration  
+- Compute can be limited to specific depth windows  
+- High-energy pulses can be constrained physically  
+
+DWDM makes this unnecessary but available.
+
+---
+
+## 4.8 Digital Shell Role
+
+The digital layer:
+
+- sequences operations  
+- configures pulse parameters  
+- performs safety interlocks  
+
+It does *not* compute.
+
+---
+
+## 4.9 Summary
+
+Compute is:
+
+- volumetric  
+- optical  
+- nonlinear  
+- in-place  
+- massively parallel  
+- independent of electronic architecture  
+
+AUT-3 supersedes GPUs, CPUs, NPUs, and TPUs.
