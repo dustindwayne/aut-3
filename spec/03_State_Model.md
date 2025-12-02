@@ -2,96 +2,68 @@
 
 ## 3.1 Voxel Grid
 
-The volumetric medium in each cube is abstracted as a **voxel grid**:
+The volumetric medium in each cube is abstracted as a voxel grid:
 
 - Dimensions: `Nx × Ny × Nz`
-- Voxel coordinates: `(x, y, z)` with integer indices
-- Physical resolution (voxel size) is implementation-defined.
+- Coordinates `(x, y, z)` are integer indices
+- Voxel size/resolution is implementation-dependent
 
-The voxel grid is a conceptual discretization used to model and control the system. The underlying physical medium may be continuous, but control and reconstruction operate at voxel granularity.
+The voxel grid is a conceptual representation; the underlying medium may be continuous, but control and reconstruction operate at voxel granularity.
 
 ## 3.2 Voxel State Vector
 
-Each voxel has an associated **state vector**:
+Each voxel has a state vector:
 
-- `S(x, y, z) ∈ ℝ^K`
+`S(x, y, z) ∈ ℝ^K`
 
-where:
+Components correspond to optical properties such as:
 
-- `K` is the number of state components per voxel.
-- Components represent optical properties or derived quantities, for example:
-  - Absorption at specific wavelengths.
-  - Phase delay.
-  - Refractive index changes.
-  - Fluorescence intensity in specific bands.
-  - Aggregated or filtered responses.
+- Absorption at specific wavelengths
+- Phase delay
+- Refractive index shift
+- Fluorescence components
+- Derived numerical features
 
-AUT-3 does not require a specific `K`. Implementers choose `K` large enough to represent the necessary information for compute and memory roles.
+The dimension `K` is chosen per implementation.
 
-## 3.3 Functional Channels
+## 3.3 Functional Channels via Dense Wavelength Division Multiplexing (DWDM)
 
-State vector components are grouped into **functional channels**:
+AUT-3 uses **Dense Wavelength Division Multiplexing (DWDM)** to assign stable functional roles to different spectral bands.  
+This solves the classical occlusion problem in volumetric optical systems.
 
-- **Storage channel(s)**:
-  - Components with high stability and long retention.
-- **RAM channel(s)**:
-  - Components with faster write and higher endurance but moderate retention.
-- **Cache / compute channel(s)**:
-  - Components with the fastest dynamics, suitable for transient computation.
+### **Spectral Role Allocation**
 
-For example:
+| Spectral Band | Function | Rationale |
+|---------------|----------|-----------|
+| **Red / Infrared (≈700–1600 nm)** | **Static Storage (OS, files, long-term layers)** | Long absorption lengths + low scattering → ideal for reaching deep layers without disturbing upper RAM or compute regions. |
+| **Green / Visible (≈520–580 nm)** | **Active RAM (variables, working state)** | Stronger absorption + shorter penetration → ideal for mid-depth dynamic updates. |
+| **Blue / UV (≈350–480 nm)** | **Compute / Logic (tensor weights, transient compute fields)** | High-energy, shallow-interaction band suited for fast transient computation. |
 
-- `S = [S_store, S_ram, S_cache]`
-- Each sub-vector may itself be multidimensional.
+### **Occlusion Avoidance**
 
-The mapping between state components and roles is implementation-defined but must be documented in any concrete AUT-3 system.
+DWDM ensures that:
+
+- **Storage-layer wavelengths (Red/IR)** pass *through* RAM and Compute regions because those layers do not significantly absorb in the Red/IR band.
+- **RAM wavelengths (Green)** operate in a middle band that does not interfere with storage or compute channels.
+- **Compute wavelengths (Blue/UV)** operate at shallow depth and do not disturb deep storage layers.
+
+This allows **independent addressing of layered behaviors** without voxel shadowing or inter-layer signal blocking.
 
 ## 3.4 State Evolution
 
-State evolution is driven by:
+Voxel state evolves through:
 
-- **Write operations**:
-  - Intentionally modify state components via controlled illumination.
-- **Compute operations**:
-  - Use optical fields to transform subsets of the state, possibly in-place.
-- **Natural drift and relaxation**:
-  - Material-specific processes that slowly change state in the absence of input.
+- Write operations (DWDM-targeted updates)
+- Compute-field interactions
+- Natural drift and relaxation (material-dependent)
 
-The architecture assumes:
-
-- There exists a characteristic timescale for drift in each channel.
-- Control systems can refresh or correct state fast enough to maintain desired behavior.
+Firmware ensures refresh where required.
 
 ## 3.5 Observability
 
-State is observed indirectly via optical readout:
-
-- Probe fields pass through or interact with the volume.
-- Sensors capture resulting intensities or phases.
-- Reconstruction algorithms map sensor data back to an estimate of `S(x, y, z)`.
-
-The reconstructed state is an approximation of the physical state, subject to:
-
-- Sensor noise.
-- Model error.
-- Resolution limits.
-
-AUT-3 requires that:
-
-- Reconstruction accuracy is sufficient for the intended compute and memory roles.
-- Error bounds can be characterized and accounted for at higher levels.
+Probe lasers operate in a **non-conflicting wavelength band**, ensuring readout does not disturb stored DWDM channels.
 
 ## 3.6 Logical Addressing
 
-Logical addressing in AUT-3 refers to:
-
-- Mapping higher-level data structures (tensors, graphs, fields) onto the voxel grid and state vectors.
-- Managing placement decisions such as:
-  - Which regions of the grid store long-term data.
-  - Which regions serve as working buffers.
-  - Which regions participate in compute operations.
-
-The architecture does not fix a single logical addressing scheme. However, it assumes that:
-
-- Logical structures can be mapped to voxel subsets.
-- The mapping can be tracked and updated as the system reuses and restructures space.
+Logical addressing maps structured data (fields, tensors) to voxel subsets.  
+DWDM bands ensure channel separation independent of physical voxel adjacency.
