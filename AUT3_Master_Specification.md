@@ -1,179 +1,181 @@
 # AUT-3 Master Specification  
 Volumetric Photonic Compute–Memory Architecture
 
-This master document aggregates the modular specification in `spec/` into a single file for convenient reading. Each section corresponds to a chapter file.
+This master document aggregates all modular specification chapters in `spec/` into a single technical reference. It incorporates the latest engineering updates: DWDM spectral allocation, Closed-Loop Wavelength Locking, and femtosecond pulse constraints.
 
 ---
 
 ## 1. Architecture Overview
 
-(See `spec/01_Architecture_Overview.md`)
+AUT-3 defines a **unified 3D photonic compute–memory architecture** in which the same volumetric medium:
 
-AUT-3 defines a **3D photonic compute–memory volume** where the same physical substrate holds state and performs computation. Information is stored as continuous, multi-dimensional optical states in a volumetric medium. Computation is implemented by controlled laser fields interacting with that medium.
+- stores state (long-term, working, transient)
+- performs computation via optical field interactions
+- exposes multiband, multi-depth readout via DWDM
 
-AUT-3 is **not** an add-on accelerator; it is a replacement for the classical CPU/RAM/cache/storage stack.
+Unlike classical systems (CPU + RAM + storage), AUT-3 merges all roles into a **volumetric photonic substrate**.
 
-Key design principles:
+Key principles:
 
-- Unified compute and memory
-- Volumetric (3D) state space
-- Optical write and read paths
-- Wavelength-based role separation (storage / RAM / cache / compute)
-- Modular cube nodes that scale in a mesh
+- unified compute + memory
+- volumetric parallelism
+- DWDM wavelength separation for functional roles
+- femtosecond compute pulses
+- closed-loop wavelength locking for thermal stability
 
 ---
 
 ## 2. Physical Architecture
 
-(See `spec/02_Physical_Architecture.md`)
+A cube node contains:
 
-Physical AUT-3 systems are assembled from **cubes** (nodes). Each cube contains:
+- a volumetric optical medium partitioned by **spectral-role behavior**
+- a **2D write plane** (multi-wavelength laser/LED grid)
+- a **3D read laser array** for volumetric tomography
+- controller electronics with thermal/wavelength compensation
 
-- A volumetric optical medium with tunable optical properties
-- At least one **2D write plane** (laser or micro-LED grid)
-- At least one **read plane** (laser + sensor system for volumetric scanning)
-- Local control electronics and mechanical interfaces
-
-The write plane imprints optical state into the volume. The read plane reconstructs the volume using optical tomography or related methods. Multiple wavelengths and entry directions can be used to give different functional roles to the same volume.
+DWDM enables the write and read subsystems to access specific channels without interference or occlusion.
 
 ---
 
 ## 3. State Model
 
-(See `spec/03_State_Model.md`)
+The medium is modeled as a **voxel grid** with a multidimensional state vector.
 
-Space inside a cube is represented as a 3D grid of **voxels**. Each voxel has a **state vector**:
+### 3.1 Dense Wavelength Division Multiplexing (DWDM)
 
-- Continuous-valued components derived from optical properties
-- Potentially dependent on wavelength and direction of interaction
-- Grouped into functional channels (e.g., storage, RAM, cache, compute)
+To avoid occlusion and enable depth-specific addressing:
 
-The state model is defined independently of any specific material. It assumes that per-voxel state can be read and written with bounded noise and drift.
+| Band | Function | Details |
+|------|----------|---------|
+| **Red / IR (700–1600nm)** | **Static Storage** | Deep penetration, low scatter. Ideal for OS, long-term data. |
+| **Green / Visible (520–580nm)** | **Active RAM** | Mid-penetration; good for high-speed updates. |
+| **Blue / UV (350–480nm)** | **Compute / Logic** | High-energy shallow interactions for fast compute. |
+
+This ensures each layer can be accessed without blocking or modifying others.
+
+### 3.2 State Vector
+
+Each voxel exposes:
+
+`S(x,y,z) ∈ ℝ^K`, partitioned into:
+- storage components (Red/IR)
+- RAM components (Green)
+- compute-transient components (Blue/UV)
 
 ---
 
 ## 4. Compute Model
 
-(See `spec/04_Compute_Model.md`)
+Compute operations are defined as **optical transformations** of voxel state.
 
-Computation in AUT-3 is modeled as **optical transformations** of the volumetric state:
-
-- Optical fields are injected via write or compute beams
-- The medium transforms these fields according to its optical transfer function
-- Resulting fields are sampled and mapped back to updated voxel states
-
-Operations are expressed as sequences of **field–medium–readout cycles**, which can be parallelized extensively due to the volumetric nature of the medium.
+- Femtosecond pulses (<100fs) perform nonlinear compute steps.
+- Blue/UV wavelengths implement compute due to fast, shallow, high-energy interaction.
+- Compute is in-place; no data shuttling to separate processors.
 
 ---
 
 ## 5. Memory Model
 
-(See `spec/05_Memory_Model.md`)
+AUT-3 replaces traditional memory hierarchy with **spectral roles**:
 
-The AUT-3 memory model does not distinguish CPU registers, cache, RAM, and storage as separate devices. Instead, it defines:
+- Storage region → Red/IR channel  
+- Working memory → Green channel  
+- Compute cache → Blue/UV channel  
 
-- Stability tiers (long-term, mid-term, short-term)
-- Regions of the cube optimized for each tier
-- Role-based wavelength usage for different tiers
+Logical placement maps data to spectral channels, not hardware devices.
 
-Allocation and placement policies are handled by software and firmware but respect the physical differences between tiers.
+DWDM ensures each channel remains isolated and addressable.
 
 ---
 
 ## 6. Control Plane and Programming Model
 
-(See `spec/06_Control_Plane_and_Programming.md`)
+### 6.1 Closed-Loop Wavelength Locking  
+Thermal expansion changes the medium’s refractive index, shifting absorption peaks.  
+AUT-3 actively corrects this drift via:
 
-The control plane defines:
+1. Read-laser probes detect Δλ drift.
+2. Controller computes compensation offset.
+3. Emitters retune wavelengths accordingly.
 
-- How host systems configure and command cubes
-- How operations are described (instruction-like sequences)
-- How programs express volumetric operations and dataflow
+Example: medium drifts **+2 nm**, lasers retune **+2 nm**.
 
-The programming model can be exposed as:
-
-- A low-level instruction set for optical operations
-- A higher-level tensor or field computation API
-- A graph-based compute model that maps naturally to AUT-3 operations
+This replaces aggressive cooling with **optical self-alignment**.
 
 ---
 
 ## 7. Node Mesh and Scaling
 
-(See `spec/07_Node_Mesh_and_Scaling.md`)
+Nodes can be arranged in 1D, 2D, or 3D meshes.
 
-Multiple AUT-3 cubes can be connected into a **mesh**:
+Scaling increases:
 
-- Each node exposes a logical address space of volumetric state
-- Nodes communicate via high-bandwidth links
-- Redundancy and distribution are handled at firmware and system levels
+- volumetric compute capacity
+- volumetric storage capacity
+- cross-node redundancy
 
-The mesh architecture allows capacity and compute power to scale linearly with node count, subject to interconnect constraints.
+Channels remain globally addressable, and DWDM behavior is preserved across nodes.
 
 ---
 
 ## 8. Fault Tolerance and Reliability
 
-(See `spec/08_Fault_Tolerance_and_Reliability.md`)
+Fault handling includes:
 
-AUT-3 includes fault-tolerance mechanisms at several levels:
+- voxel redundancy
+- regional bypass
+- spectral remapping
+- node replication
+- continuous calibration through wavelength-locking probes
 
-- Per-voxel redundancy and error-tolerant reconstruction
-- Regional remapping of damaged zones
-- Node-level redundancy in the mesh
-- Background self-test and recalibration routines
-
-The goal is that most physical faults are masked internally and only critical failures are exposed to higher layers.
+Most local faults are masked within firmware.
 
 ---
 
 ## 9. Performance and Limits
 
-(See `spec/09_Performance_and_Limits.md`)
+Key performance constraints:
 
-Performance is bounded by:
+- **Femtosecond pulse envelope** for compute  
+- **DWDM separation limits**  
+- **Thermal drift response time** for locking loop  
+- optical alignment tolerance  
+- reconstruction bandwidth of the read system
 
-- Optical propagation speed
-- Medium response times
-- Laser and sensor rates
-- Reconstruction and control overhead
-
-The document outlines expected orders of magnitude and scaling behavior, but concrete numbers depend on material and implementation choices.
+With femtosecond pulses, thermal blooming is avoided, enabling stable long-term operation.
 
 ---
 
 ## 10. AI Relevance and Use Cases
 
-(See `spec/10_AI_Relevance_and_Use_Cases.md`)
+Ideal workloads:
 
-AUT-3 is especially suited to AI workloads that:
+- tensor transforms
+- volumetric field updates
+- high-dimensional continuous compute
+- associative memory
+- hybrid photonic AI models
 
-- Exploit high-dimensional continuous state
-- Use large tensors and fields
-- Benefit from in-memory compute
-- Require associative or distributed representations
-
-Use cases include deep learning acceleration, continuous-state world models, and systems that blend storage and computation.
+AUT-3 merges compute and memory, removing the memory bandwidth bottleneck.
 
 ---
 
 ## 11. Implementation Notes
 
-(See `spec/11_Implementation_Notes.md`)
-
-This section collects engineering notes and constraints:
-
-- Candidate materials and their trade-offs
-- Laser and sensor options
-- Thermal management
-- Prototyping strategies
+- Must operate with **<100 fs** pulses to prevent thermal blooming.
+- Requires DWDM-capable emitter arrays.
+- Materials must tolerate high peak optical flux.
+- Cooling reduced due to wavelength locking.
+- Prototyping may begin with picosecond systems but final units require femtosecond stability.
 
 ---
 
 ## 12. Glossary
 
-(See `spec/12_Glossary.md`)
-
-Defines core terms used throughout the specification.
+- **DWDM**: Dense Wavelength Division Multiplexing.
+- **Closed-Loop Wavelength Locking**: Laser retuning to compensate refractive-index drift.
+- **Compute Pulse**: Femtosecond optical burst performing nonlinear transformations.
+- **3D Read Array**: Volumetric laser sampling system for state reconstruction.
 
 ---
