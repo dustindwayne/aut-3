@@ -3,8 +3,6 @@
 <p align="center">
   <img src="./aut-3.svg" alt="AUT-3 Logo" width="260" style="border-radius:30px">
 </p>
-
-<h1 align="center" style="margin-top: 0;">AUT-3</h1>
 <p align="center">
   <strong>Volumetric Photonic Compute–Memory Architecture</strong>
 </p>
