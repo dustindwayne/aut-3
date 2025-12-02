@@ -4,32 +4,35 @@
   <meta charset="UTF-8" />
   <title>AUT-3 Documentation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <style>
     :root {
       --bg: #f5f5f7;
-      --bg-elevated: #ffffff;
+      --panel-bg: #ffffff;
       --border-subtle: #e5e7eb;
-      --text: #0f172a;
+      --border-strong: #d1d5db;
+      --text: #020617;
       --text-muted: #6b7280;
-      --accent: #3b82f6;
-      --accent-soft: rgba(59, 130, 246, 0.08);
-      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.12);
+      --accent: #2563eb;
+      --accent-soft: rgba(37,99,235,0.08);
       --radius-lg: 18px;
-      --radius-md: 12px;
-      --transition-fast: 160ms ease-out;
+      --radius-md: 10px;
+      --shadow: 0 18px 40px rgba(15,23,42,0.12);
+      --transition: 140ms ease-out;
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
         --bg: #020617;
-        --bg-elevated: #020617;
-        --border-subtle: #1e293b;
+        --panel-bg: #020617;
+        --border-subtle: #1f2933;
+        --border-strong: #111827;
         --text: #e5e7eb;
         --text-muted: #9ca3af;
         --accent: #38bdf8;
-        --accent-soft: rgba(56, 189, 248, 0.12);
-        --shadow-soft: 0 24px 60px rgba(15, 23, 42, 0.9);
+        --accent-soft: rgba(56,189,248,0.14);
+        --shadow: 0 26px 60px rgba(15,23,42,0.95);
       }
     }
 
@@ -39,14 +42,15 @@
 
     body {
       margin: 0;
-      min-height: 100vh;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
         "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top left, rgba(56,189,248,0.12), transparent 55%),
-                  radial-gradient(circle at bottom right, rgba(37,99,235,0.12), transparent 55%),
-                  var(--bg);
+      background:
+        radial-gradient(circle at top left, rgba(56,189,248,0.12), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(37,99,235,0.12), transparent 60%),
+        var(--bg);
       color: var(--text);
-      padding: 24px;
+      min-height: 100vh;
+      padding: 18px;
       display: flex;
       justify-content: center;
       align-items: stretch;
@@ -54,378 +58,373 @@
 
     .shell {
       width: 100%;
-      max-width: 1080px;
-      background: linear-gradient(145deg, rgba(15,23,42,0.02), transparent),
-                  var(--bg-elevated);
+      max-width: 1200px;
+      background: var(--panel-bg);
       border-radius: 24px;
       border: 1px solid var(--border-subtle);
-      box-shadow: var(--shadow-soft);
-      padding: 24px 24px 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      position: relative;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
       overflow: hidden;
     }
 
-    .shell::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 10% 0%, rgba(56,189,248,0.12), transparent 55%),
-                  radial-gradient(circle at 80% 100%, rgba(59,130,246,0.12), transparent 55%);
-      pointer-events: none;
-      opacity: 0.9;
-      mix-blend-mode: soft-light;
-    }
-
-    header {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-    }
-
-    .title-block {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .label {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 3px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--accent);
-      background: var(--accent-soft);
-      border: 1px solid rgba(148,163,184,0.25);
-    }
-
-    .label-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 12px rgba(56,189,248,0.8);
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 28px;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-
-    .subtitle {
-      margin: 0;
-      font-size: 14px;
-      color: var(--text-muted);
-      max-width: 560px;
-    }
-
-    .tagline {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .hero-meta {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 6px;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .hero-meta strong {
-      color: var(--text);
-    }
-
-    .hero-chip {
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.35);
-      backdrop-filter: blur(12px);
-      background: radial-gradient(circle at top, rgba(148,163,184,0.3), transparent 65%);
-    }
-
-    main {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1.1fr);
-      gap: 20px;
-    }
-
-    @media (max-width: 800px) {
-      main {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      .hero-meta {
-        align-items: flex-start;
-      }
-    }
-
-    .panel {
-      border-radius: var(--radius-lg);
-      border: 1px solid rgba(148,163,184,0.35);
-      background: linear-gradient(145deg, rgba(15,23,42,0.5), rgba(15,23,42,0.0));
-      background-color: rgba(15,23,42,0.04);
-      padding: 16px 16px 18px;
-      backdrop-filter: blur(12px);
-      position: relative;
-      overflow: hidden;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      .panel {
-        background-color: rgba(15,23,42,0.9);
-      }
-    }
-
-    .panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-
-    .panel-title {
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-muted);
-    }
-
-    .pill {
-      font-size: 11px;
-      padding: 3px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.35);
-      color: var(--text-muted);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 10px;
-    }
-
-    @media (max-width: 800px) {
-      .grid {
+    @media (max-width: 880px) {
+      .shell {
         grid-template-columns: minmax(0, 1fr);
       }
     }
 
-    .card {
-      position: relative;
-      border-radius: var(--radius-md);
-      padding: 10px 11px 12px;
-      background: radial-gradient(circle at 0 0, rgba(56,189,248,0.16), transparent 60%),
-                  rgba(15,23,42,0.8);
-      border: 1px solid rgba(148,163,184,0.55);
-      color: var(--text);
-      text-decoration: none;
+    .side {
+      background:
+        radial-gradient(circle at top, rgba(56,189,248,0.12), transparent 60%),
+        linear-gradient(180deg, #020617, #020617);
+      color: #e5e7eb;
+      padding: 18px 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      border-right: 1px solid rgba(15,23,42,0.75);
+    }
+
+    .side-header {
       display: flex;
       flex-direction: column;
       gap: 4px;
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast),
-                  border-color var(--transition-fast), background var(--transition-fast);
-      cursor: pointer;
     }
 
-    body:not(.nohover) .card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(15,23,42,0.8);
-      border-color: var(--accent);
-      background: radial-gradient(circle at 0 0, rgba(56,189,248,0.28), transparent 65%),
-                  rgba(15,23,42,0.96);
+    .side-label {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #9ca3af;
     }
 
-    .card-title {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
+    .side-title {
+      font-size: 18px;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
-    .card-desc {
+    .side-sub {
       font-size: 12px;
-      color: var(--text-muted);
+      color: #9ca3af;
     }
 
-    .card-meta {
+    .side-section-title {
+      margin-top: 8px;
       font-size: 11px;
-      color: var(--accent);
-      margin-top: 2px;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
     }
 
-    .list {
+    .nav {
+      margin: 4px 0 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    .nav-button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 9px;
+      border-radius: 9px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #cbd5f5;
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+      transition: background var(--transition), border-color var(--transition), transform var(--transition);
+    }
+
+    body:not(.nohover) .nav-button:hover {
+      background: rgba(15,23,42,0.9);
+      border-color: rgba(148,163,184,0.6);
+      transform: translateX(1px);
+    }
+
+    .nav-button span {
+      pointer-events: none;
+    }
+
+    .nav-button small {
+      font-size: 10px;
+      opacity: 0.7;
+    }
+
+    .nav-button.active {
+      background: linear-gradient(90deg, var(--accent-soft), transparent);
+      border-color: var(--accent);
+      color: #e5e7eb;
+    }
+
+    .side-footer {
+      margin-top: auto;
+      font-size: 11px;
+      color: #9ca3af;
+      border-top: 1px solid rgba(15,23,42,0.85);
+      padding-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .side-footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .main {
+      padding: 16px 18px 20px;
+      background: var(--panel-bg);
       display: flex;
       flex-direction: column;
       gap: 8px;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .list-item-label {
-      font-weight: 500;
-      color: var(--text);
-    }
-
-    footer {
-      position: relative;
-      z-index: 1;
-      font-size: 11px;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 6px;
-    }
-
-    .accent-bar {
-      position: absolute;
-      inset: 0;
-      width: 3px;
-      left: 0;
-      background: linear-gradient(180deg, #38bdf8, #4f46e5);
-      opacity: 0.9;
-    }
-
-    .accent-bar + .shell {
-      padding-left: 26px;
+      overflow: auto;
     }
 
     @media (max-width: 640px) {
       body {
-        padding: 10px;
+        padding: 8px;
       }
-      .accent-bar + .shell {
-        padding-left: 20px;
+      .main {
+        padding: 14px 12px 18px;
       }
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .crumbs a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .file-tag {
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(148,163,184,0.10);
+      font-size: 11px;
+    }
+
+    .status {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .error {
+      color: #ef4444;
+    }
+
+    .doc {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-strong);
+      background:
+        radial-gradient(circle at top, rgba(15,23,42,0.06), transparent 60%),
+        rgba(255,255,255,0.96);
+      padding: 16px 18px 20px;
+      max-width: 920px;
+      margin: 0 auto;
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .doc {
+        background:
+          radial-gradient(circle at top, rgba(56,189,248,0.14), transparent 60%),
+          rgba(15,23,42,0.98);
+      }
+    }
+
+    .doc h1, .doc h2, .doc h3, .doc h4 {
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    .doc h1 { font-size: 22px; }
+    .doc h2 { font-size: 18px; }
+    .doc h3 { font-size: 16px; }
+
+    .doc p {
+      margin: 8px 0;
+    }
+
+    .doc code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      background: rgba(15,23,42,0.06);
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+
+    .doc pre {
+      background: rgba(15,23,42,0.92);
+      color: #e5e7eb;
+      padding: 10px 12px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+
+    .doc a {
+      color: var(--accent);
     }
   </style>
 </head>
 <body>
-  <div class="accent-bar"></div>
   <div class="shell">
-    <header>
-      <div class="title-block">
-        <span class="label">
-          <span class="label-dot"></span>
-          AUT-3 ARCHITECTURE
-        </span>
-        <h1>AUT-3</h1>
-        <p class="subtitle">
-          Volumetric photonic compute–memory system. Wavelength-structured storage, RAM, and compute in a single 3D optical medium.
-        </p>
-        <p class="tagline">
-          DWDM separation · femtosecond compute pulses · 3D tomographic readout · no CPU/GPU/RAM hierarchy.
-        </p>
+    <aside class="side">
+      <div class="side-header">
+        <div class="side-label">AUT-3</div>
+        <div class="side-title">Docs</div>
+        <div class="side-sub">
+          Volumetric photonic compute–memory architecture. Choose a document to view the exact specification text rendered from the repo.
+        </div>
       </div>
-      <div class="hero-meta">
-        <div class="hero-chip">
-          Inventor: <strong>github.com/dustindwayne</strong>
-        </div>
-        <div>License: CERN-OHL-S-2.0</div>
+
+      <div class="side-section-title">Core</div>
+      <ul class="nav" id="nav-core"></ul>
+
+      <div class="side-section-title">Chapters</div>
+      <ul class="nav" id="nav-chapters"></ul>
+
+      <div class="side-footer">
+        <span>Source: <a href="https://github.com/dustindwayne/aut-3">github.com/dustindwayne/aut-3</a></span>
+        <span>Rendered client-side from Markdown.</span>
       </div>
-    </header>
+    </aside>
 
-    <main>
-      <section class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Specification</div>
-          <div class="pill">Start here</div>
+    <main class="main">
+      <div class="top">
+        <div class="crumbs">
+          <a href="#">AUT-3</a> · <span id="crumb-label">Master Specification</span>
         </div>
-        <div class="grid">
-          <a class="card" href="page.html?file=AUT3_Master_Specification.md">
-            <div class="card-title">Master Specification</div>
-            <div class="card-desc">
-              Single-file overview of the entire AUT-3 architecture: physical model, state model, compute, memory, control, and scaling.
-            </div>
-            <div class="card-meta">View full spec →</div>
-          </a>
-
-          <a class="card" href="page.html?file=defensive-publication/AUT3_Defensive_Publication.md">
-            <div class="card-title">Defensive Publication</div>
-            <div class="card-desc">
-              Formal disclosure defining AUT-3 as prior art, covering the unified photonic compute–memory system and all key mechanisms.
-            </div>
-            <div class="card-meta">Legal-facing text →</div>
-          </a>
-
-          <a class="card" href="page.html?file=spec/01_Architecture_Overview.md">
-            <div class="card-title">Architecture Overview</div>
-            <div class="card-desc">
-              High-level breakdown of the volumetric medium, DWDM roles, digital shell, and how AUT-3 replaces legacy CPU/GPU/RAM/SSD stacks.
-            </div>
-            <div class="card-meta">Core model →</div>
-          </a>
-
-          <a class="card" href="page.html?file=defensive-publication/AUT3_Claims_Appendix.md">
-            <div class="card-title">Claims Appendix</div>
-            <div class="card-desc">
-              Patent-style claim set written as defensive prior art, blocking proprietary claims over AUT-3’s architecture and variants.
-            </div>
-            <div class="card-meta">Claims-style view →</div>
-          </a>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Deep Dive</div>
-          <div class="pill">Chapters</div>
-        </div>
-        <div class="list">
-          <div>
-            <span class="list-item-label">State + Compute:</span>
-            <a href="page.html?file=spec/03_State_Model.md">State Model</a> ·
-            <a href="page.html?file=spec/04_Compute_Model.md">Compute Model</a> ·
-            <a href="page.html?file=spec/05_Memory_Model.md">Memory Model</a>
-          </div>
-          <div>
-            <span class="list-item-label">Control + Scaling:</span>
-            <a href="page.html?file=spec/06_Control_Plane_and_Programming.md">Control Plane</a> ·
-            <a href="page.html?file=spec/07_Node_Mesh_and_Scaling.md">Node Mesh</a> ·
-            <a href="page.html?file=spec/08_Fault_Tolerance_and_Reliability.md">Fault Tolerance</a>
-          </div>
-          <div>
-            <span class="list-item-label">Performance + AI:</span>
-            <a href="page.html?file=spec/09_Performance_and_Limits.md">Performance & Limits</a> ·
-            <a href="page.html?file=spec/10_AI_Relevance_and_Use_Cases.md">AI Relevance</a>
-          </div>
-          <div>
-            <span class="list-item-label">Implementation:</span>
-            <a href="page.html?file=spec/11_Implementation_Notes.md">Implementation Notes</a> ·
-            <a href="page.html?file=spec/12_Glossary.md">Glossary</a>
-          </div>
-        </div>
-      </section>
+        <div id="file-label" class="file-tag"></div>
+      </div>
+      <div id="status" class="status">Loading…</div>
+      <article id="content" class="doc"></article>
     </main>
-
-    <footer>
-      <div>Built as a volumetric photonic compute–memory specification, not marketing copy.</div>
-      <div>Docs served statically from GitHub Pages · Markdown rendered client-side.</div>
-    </footer>
   </div>
 
   <script>
-    // Reduce hover effects on touch-only devices
+    // soften hover on touch devices
     if ('ontouchstart' in window) {
       document.body.classList.add('nohover');
     }
+
+    // documents mapping (file paths must match repo)
+    const docs = [
+      // Core
+      { id: "master", label: "Master Specification", file: "AUT3_Master_Specification.md", group: "core" },
+      { id: "pub", label: "Defensive Publication", file: "defensive-publication/AUT3_Defensive_Publication.md", group: "core" },
+      { id: "claims", label: "Claims Appendix", file: "defensive-publication/AUT3_Claims_Appendix.md", group: "core" },
+
+      // Chapters
+      { id: "arch", label: "Architecture Overview", file: "spec/01_Architecture_Overview.md", group: "chapters" },
+      { id: "state", label: "State Model", file: "spec/03_State_Model.md", group: "chapters" },
+      { id: "compute", label: "Compute Model", file: "spec/04_Compute_Model.md", group: "chapters" },
+      { id: "memory", label: "Memory Model", file: "spec/05_Memory_Model.md", group: "chapters" },
+      { id: "control", label: "Control Plane", file: "spec/06_Control_Plane_and_Programming.md", group: "chapters" },
+      { id: "mesh", label: "Node Mesh & Scaling", file: "spec/07_Node_Mesh_and_Scaling.md", group: "chapters" },
+      { id: "faults", label: "Fault Tolerance", file: "spec/08_Fault_Tolerance_and_Reliability.md", group: "chapters" },
+      { id: "perf", label: "Performance & Limits", file: "spec/09_Performance_and_Limits.md", group: "chapters" },
+      { id: "ai", label: "AI Relevance & Use Cases", file: "spec/10_AI_Relevance_and_Use_Cases.md", group: "chapters" },
+      { id: "impl", label: "Implementation Notes", file: "spec/11_Implementation_Notes.md", group: "chapters" },
+      { id: "gloss", label: "Glossary", file: "spec/12_Glossary.md", group: "chapters" },
+    ];
+
+    function getParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    // choose document by ?file=, fallback to master
+    const requestedFile = getParam('file');
+    const current = requestedFile
+      ? docs.find(d => d.file === requestedFile) || docs[0]
+      : docs[0];
+
+    const statusEl = document.getElementById('status');
+    const contentEl = document.getElementById('content');
+    const crumbLabel = document.getElementById('crumb-label');
+    const fileLabel = document.getElementById('file-label');
+
+    crumbLabel.textContent = current.label;
+    fileLabel.textContent = current.file;
+
+    function buildNav() {
+      const coreList = document.getElementById('nav-core');
+      const chapterList = document.getElementById('nav-chapters');
+      coreList.innerHTML = "";
+      chapterList.innerHTML = "";
+
+      docs.forEach(doc => {
+        const li = document.createElement('li');
+        const btn = document.createElement('button');
+        btn.type = "button";
+        btn.className = "nav-button" + (doc.file === current.file ? " active" : "");
+        btn.onclick = () => {
+          const basePath = window.location.pathname.split('/').slice(0, 2).join('/') + '/';
+          const target = window.location.origin + basePath + "docs/index.html?file=" + encodeURIComponent(doc.file);
+          window.location.href = target;
+        };
+
+        const left = document.createElement('span');
+        left.textContent = doc.label;
+        const right = document.createElement('small');
+        right.textContent = doc.group === "core" ? "core" : "chapter";
+
+        btn.appendChild(left);
+        btn.appendChild(right);
+        li.appendChild(btn);
+
+        if (doc.group === "core") {
+          coreList.appendChild(li);
+        } else {
+          chapterList.appendChild(li);
+        }
+      });
+    }
+
+    buildNav();
+
+    // compute project root path: "/aut-3/"
+    const pathParts = window.location.pathname.split('/'); // ["", "aut-3", "docs", "index.html"]
+    const projectRoot = pathParts.slice(0, 2).join('/') + '/'; // "/aut-3/"
+    const url = projectRoot + current.file;
+
+    statusEl.textContent = "Loading " + current.file + " …";
+
+    fetch(url)
+      .then(r => {
+        if (!r.ok) throw new Error("HTTP " + r.status + " for " + url);
+        return r.text();
+      })
+      .then(md => {
+        statusEl.textContent = "";
+        contentEl.innerHTML = marked.parse(md);
+      })
+      .catch(err => {
+        statusEl.innerHTML = "<span class='error'>Error loading document.</span>";
+        contentEl.innerHTML =
+          "<p>Failed to load:</p><pre>" + current.file + "</pre><p>" + err + "</p>";
+      });
   </script>
 </body>
 </html>
