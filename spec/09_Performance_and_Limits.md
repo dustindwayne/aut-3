@@ -1,79 +1,96 @@
 # 9. Performance and Limits — AUT-3
 
-## 9.1 Performance Factors
+Performance is defined by volumetric optical throughput, not clock rates or ALU
+counts. AUT-3’s compute occurs across millions of voxels simultaneously through
+femtosecond field interactions.
 
-Key factors influencing AUT-3 performance include:
+---
 
-- **Optical propagation**:
-  - Light transit time across the volume (typically negligible relative to other factors).
-- **Medium response**:
-  - Time for state changes to occur in response to illumination.
-- **Emitter and sensor bandwidth**:
-  - Maximum pattern update rates and frame rates.
-- **Reconstruction and control**:
-  - Computational cost of reconstructing state from projections.
-  - Time to configure optical fields and schedule operations.
+## 9.1 Compute Parallelism
 
-## 9.2 Parallelism
+Parallelism arises from:
+- volumetric region-wide updates
+- spectral channel independence
+- massively parallel optical field propagation
 
-AUT-3 naturally supports high parallelism:
+All voxels in an illuminated region update in the same femtosecond window.
 
-- Write planes can address many voxels in parallel per operation.
-- Read planes capture large regions per frame.
-- Compute fields act on the entire illuminated volume or subvolume simultaneously.
+---
 
-Exposed parallelism is constrained by:
+## 9.2 Bandwidth
 
-- Emitter and sensor array sizes.
-- Interference and crosstalk considerations.
-- Thermal and power limits.
+There is no memory bandwidth in the classical sense because:
+**data does not move.**
+
+Bandwidth is defined by:
+- pulse repetition rate
+- tomography throughput
+- optical field update frequency
+
+---
 
 ## 9.3 Latency
 
-Latency for a given operation combines:
+Latency sources:
+- pulse emission latency (femtosecond scale)
+- reconstruction latency (read-side)
+- digital control sequencing
 
-- Configuration latency (setting up emitters/fields).
-- Exposure or interaction time.
-- Readout and reconstruction time (if applicable).
-- Control latency (issuing commands and processing results).
+Compute latency is near-constant regardless of region size.
 
-Different workloads will emphasize different parts of this latency budget.
+---
 
-## 9.4 Throughput
+## 9.4 Thermal Limits
 
-Throughput is determined by:
+AUT-3 avoids thermal meltdown through:
+- <100 fs pulses
+- low duty cycle
+- passive cooling
+- wavelength-locking stability
 
-- Number of independent operations per unit time.
-- Volume of voxels affected per operation.
-- Ability to overlap compute, write, and read operations.
+Thermal blooming is the primary limit but avoided through ultrafast compute.
 
-AUT-3 is most effective when workloads are expressed as large, structured operations over regions, rather than fine-grained, random-access operations.
+---
 
-## 9.5 Scaling Limits
+## 9.5 Material Constraints
 
-Scaling is limited by:
+Performance is bounded by:
+- nonlinearity coefficients
+- absorption spectrum
+- refractive index stability
+- relaxation time
 
-- Material properties (e.g., maximum useful thickness before losses dominate).
-- Optical system complexity (focus, aberrations, alignment).
-- Thermal management.
-- Interconnect bandwidth between nodes.
+Material engineering determines ultimate throughput.
 
-Designers must balance:
+---
 
-- Cube size.
-- Voxel resolution.
-- Number of channels per voxel.
-- Number of cubes in a mesh.
+## 9.6 Reconstruction Limits
 
-## 9.6 Approximation and Algorithm Design
+Tomographic readout requires:
+- sufficient photodiode bandwidth
+- correct sampling density
+- accurate multi-angle projections
 
-Because AUT-3 is analog and volumetric:
+Higher spatial resolution requires more reconstruction bandwidth.
 
-- Algorithms should be designed to tolerate some approximation.
-- Many AI and signal-processing workloads are compatible with this property.
-- Bit-accurate workloads may need surrounding digital correction or alternative architectures.
+---
 
-The most suitable workloads are those where:
+## 9.7 Scaling Limits
 
-- Large, dense numerical structures are processed.
-- Small errors do not invalidate overall results.
+Mesh-scale limits include:
+- optical interconnect speed
+- wavelength-locking sync across nodes
+- readout aggregation bandwidth
+
+---
+
+## 9.8 Summary
+
+AUT-3 performance depends on:
+- volumetric optical parallelism
+- pulse rate
+- material response
+- DWDM stability
+- tomography throughput
+
+Its speed fundamentally exceeds electronic architectures due to in-place, parallel optical compute.
