@@ -1,72 +1,98 @@
 # 7. Node Mesh and Scaling — AUT-3
 
-## 7.1 Multi-Node Systems
+AUT-3 nodes can be interconnected into larger compute fabrics.  
+Since compute and memory are unified within each node, scaling expands both
+storage capacity and compute throughput simultaneously.
 
-Multiple AUT-3 cubes can be connected into a **node mesh**:
+---
 
-- Each node is functionally similar but may differ in capacity or material tuning.
-- Nodes communicate over high-bandwidth interconnects.
-- The mesh behaves as a unified compute–memory fabric from the perspective of higher-level software.
+## 7.1 Node Structure
 
-## 7.2 Topology
+Each node contains:
 
-The architecture supports flexible topologies, including:
+- volumetric compute–memory medium  
+- 2D write plane  
+- 3D tomographic read array  
+- DWDM emitter stack  
+- wavelength-locking system  
+- optional Z-gating layers  
+- minimal digital shell  
 
-- 1D chains.
-- 2D grids.
-- 3D meshes.
-- More general graphs.
+Nodes are self-contained compute units.
 
-The chosen topology should:
+---
 
-- Match physical layout constraints.
-- Support required bandwidth and latency for the target workload.
-- Provide redundancy paths where needed.
+## 7.2 Mesh Topologies
 
-## 7.3 Addressing in the Mesh
+Nodes can be arranged in:
 
-Each node has:
+- 1D linear arrays  
+- 2D grids  
+- 3D volumetric meshes  
 
-- A unique Node ID.
-- Optionally, a coordinate `(X, Y, Z)` representing its physical or logical position.
+Connections may use:
 
-Global addressing is achieved by:
+- optical fiber  
+- electrical high-speed serial links  
+- free-space optical coupling  
 
-- Combining Node ID with local voxel coordinates.
-- Managing higher-level logical address spaces across nodes.
+---
 
-## 7.4 Inter-Node Operations
+## 7.3 Distributed Wavelength Coordination
 
-Inter-node operations include:
+All nodes must maintain:
 
-- Moving or copying data between voxels on different nodes.
-- Executing pipelines where the output of one node feeds into operations on another.
-- Replication of state for redundancy.
+- synchronized DWDM channel spacing  
+- distributed wavelength-locking telemetry  
+- compatible pulse envelopes  
+- consistent temporal references  
 
-To avoid excessive data movement:
+This ensures operations remain spectral-compatible across the mesh.
 
-- Designs should favor computations that act on data where it resides.
-- Aggregation and reduction operations can be mapped to suitable nodes rather than shuttling full volumes.
+---
 
-## 7.5 Scaling Behavior
+## 7.4 Inter-Node Compute
 
-As nodes are added:
+Compute can span multiple nodes through:
 
-- Compute capacity increases roughly with total volume of active medium.
-- Memory capacity increases with total volume and state-vector dimension.
-- Interconnect requirements grow with the degree of coupling between nodes.
+- distributed optical kernels  
+- region partitioning  
+- inter-node state synchronization  
+- composite field operations  
 
-For tightly-coupled AI workloads, higher inter-node bandwidth is desirable. For more loosely coupled tasks, lower-bandwidth topologies may be acceptable.
+Nodes act as segments of a larger volumetric compute fabric.
 
-## 7.6 Heterogeneous Nodes
+---
 
-The mesh can include heterogeneous nodes, for example:
+## 7.5 Redundancy and Fault Aggregation
 
-- Nodes optimized for long-term storage.
-- Nodes tuned for high-speed compute and transient state.
-- Nodes specialized for particular wavelength ranges.
+Mesh-scale fault tolerance includes:
 
-The architecture supports heterogeneity as long as:
+- node replication  
+- spectral redundancy groups  
+- distributed Z-gating (optional)  
+- cross-node voxel remapping  
 
-- Nodes declare their capabilities.
-- The control plane and runtime understand how to route work accordingly.
+---
+
+## 7.6 Scaling Limits
+
+Scaling is limited by:
+
+- reconstruction bandwidth  
+- inter-node optical latency  
+- wavelength-locking propagation delay  
+- heat management in large arrays  
+
+---
+
+## 7.7 Summary
+
+A mesh of AUT-3 nodes creates:
+
+- a distributed, unified photonic compute volume  
+- massive volumetric parallelism  
+- shared spectral conventions  
+- no traditional memory or compute boundaries  
+
+Scaling increases compute and memory together.
