@@ -56,7 +56,6 @@ These combined elements constitute AUT-3.
 AUT-3 is a **complete compute–memory architecture** where all computation and storage occur optically inside a wavelength-structured 3D medium. There is no CPU, GPU, RAM, cache, or storage device. Only a minimal digital shell exists for control, sensing, and I/O.
 
 Core components:
-**See also:** [CLPSR Addendum](CLPSR_Addendum.md)
 
 ### (1) Volumetric State Medium  
 A 3D material exhibiting wavelength-specific absorption, refractive-index modulation, and nonlinear optical response.
@@ -285,5 +284,7 @@ All derivative works must remain open.
 
 ---
 
-
 # End of Defensive Publication
+
+
+**See also:** [CLPSR Addendum](CLPSR_Addendum.md)
