@@ -1,89 +1,122 @@
 # 5. Memory Model — AUT-3
 
-## 5.1 Unified Memory Concept
+AUT-3 eliminates the classical memory hierarchy.  
+There is no RAM, VRAM, cache, or SSD.  
+All "memory types" are spectral roles inside a single medium defined by DWDM.
 
-AUT-3 does not segregate memory into separate hardware units (registers, cache, RAM, storage). Instead, it defines **tiers** of memory behavior within the same volumetric medium:
+Memory is **not a device**.  
+Memory is **a wavelength**.
 
-- **Long-term storage**:
-  - High stability, slow write.
-- **Working memory (RAM-like)**:
-  - Faster write, moderate stability.
-- **Transient state (cache/compute)**:
-  - Fast dynamics, low retention.
+---
 
-These behaviors can be achieved via:
+## 5.1 Spectral Memory Layers
 
-- Different material regions.
-- Different state components within each voxel.
-- Different wavelength and illumination strategies.
+| Spectral Band | Memory Role              | Behavior |
+|---------------|---------------------------|----------|
+| **Red/IR**    | Long-Term Storage         | Deep penetration, durable |
+| **Green**     | RAM / Working Memory      | Fast rewrites, active region |
+| **Blue/UV**   | Compute-Transient Storage | High-energy, volatile |
 
-## 5.2 Tiers and Regions
+---
 
-A concrete AUT-3 implementation may organize its volume as:
+## 5.2 In-Place Memory
 
-- Lower depth region:
-  - Material tuned for long-term state, used for data that must persist.
-- Mid-depth region:
-  - Material optimized for working data, updated frequently.
-- Upper region:
-  - Material optimized for rapid state changes during compute operations.
+All memory is in-place.  
+No movement, paging, or copying.
 
-Alternatively, tiers may be expressed within the state vector components of each voxel (e.g., separate storage and working channels).
+Logical data structures map directly onto regions of the volume:
 
-## 5.3 Allocation and Placement
+- scalars → voxel or small cluster  
+- matrices → slices  
+- tensors → volumetric blocks  
 
-Higher-level software, in cooperation with firmware, handles:
+---
 
-- Mapping logical data structures to voxel regions and channels.
-- Choosing where to place data based on:
-  - Lifetime requirements.
-  - Update frequency.
-  - Access patterns.
+## 5.3 Memory Consistency Model
 
-Examples:
+Memory consistency arises from:
 
-- Model parameters stored in long-term channels.
-- Activations stored in working-memory channels.
-- Temporary intermediates held in transient channels.
+- optical sequencing  
+- pulse ordering  
+- wavelength-channel constraints  
+- reconstruction stability  
 
-## 5.4 Persistence
+There is no cache coherency protocol.
 
-Persistence policy is determined by channel and region:
+---
 
-- Long-term channels:
-  - Designed to maintain state across power cycles, subject to material limits.
-- Working-memory channels:
-  - May be volatile or semi-volatile.
-- Transient channels:
-  - Intended for use during active compute; not relied on for long-term retention.
+## 5.4 Long-Term Storage (Red/IR)
 
-Implementations should document:
+Red/IR wavelengths reach deep layers and do not interact with RAM or compute.
 
-- Expected retention times.
-- Recommended refresh policies.
+Used for:
 
-## 5.5 Backup and Replication
+- operating state  
+- firmware  
+- model weights  
+- file-like structures  
+- physical backups  
 
-In multi-node AUT-3 meshes, redundancy can be achieved by:
+---
 
-- Replicating critical long-term state across nodes.
-- Using projection-based snapshots of volumetric state as backup artifacts.
-- Distributed storage of snapshots and deltas in other nodes or external systems.
+## 5.5 Working Memory (Green)
 
-Backup and redundancy strategies belong at the system level. The architecture permits but does not mandate specific schemes.
+Green wavelengths:
 
-## 5.6 Address Space
+- absorb at mid-depth  
+- rewrite quickly  
+- coexist with Blue/UV compute without interference  
 
-From the perspective of host systems:
+This is the equivalent of RAM and VRAM.
 
-- AUT-3 exposes an addressable logical space of tensors or fields.
-- This space is backed by the volumetric state of one or more cubes.
+---
 
-The mapping from logical addresses to voxel regions is managed by:
+## 5.6 Compute Transients (Blue/UV)
 
-- A memory manager aware of tier behavior.
-- Firmware that enforces placement and access rules.
+Compute operates at shallow depth.  
+Blue/UV values are volatile and replaced frequently.
 
-The architecture requires that:
+Equivalent to:
 
-- Logical data can be addressed and updated without exposing physical details to general-purpose software (unless desired).
+- registers  
+- L1 cache  
+- shader registers  
+- tensor accumulation buffers  
+
+---
+
+## 5.7 Optional Z-Gating
+
+Z-gating can enforce:
+
+- write protection  
+- deep-storage safety  
+- compute isolation  
+
+Used primarily for high-energy environments or redundancy requirements.
+
+---
+
+## 5.8 External Persistence
+
+Even though AUT-3 holds long-term storage internally, external persistence may be used for:
+
+- system bootstrapping  
+- exchange formats  
+- interoperability  
+
+Persistence occurs through volumetric readout → digital encoding → storage.
+
+---
+
+## 5.9 Summary
+
+Memory is:
+
+- volumetric  
+- wavelength-organized  
+- in-place  
+- unified with compute  
+- massively parallel  
+
+There are no classical memory devices.
