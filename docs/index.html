@@ -2,161 +2,136 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AUT-3 Documentation Index</title>
-
+<title>AUT-3 Documentation Viewer</title>
 <style>
     body {
         margin: 0;
-        background:
-            radial-gradient(circle at 25% 15%, #101010 0%, #050505 70%),
-            linear-gradient(180deg, #000 0%, #0a0a0a 100%);
+        background: #000;
         font-family: "Inter", "Segoe UI", Roboto, sans-serif;
         color: #eaeaea;
-        line-height: 1.55;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
     }
 
-    /* Header */
-    header {
-        padding: 50px 16px 30px;
+    /* Sidebar */
+    #sidebar {
+        width: 320px;
+        background:
+            radial-gradient(circle at 20% 10%, #111 0%, #050505 70%),
+            linear-gradient(180deg, #000 0%, #0a0a0a 100%);
+        border-right: 1px solid #222;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    #sidebar h2 {
+        font-size: 1.3em;
+        margin-bottom: 20px;
         text-align: center;
-    }
-    h1 {
-        margin: 0;
-        font-size: 2.4em;
         font-weight: 600;
-        background: linear-gradient(90deg, #fff, #bfbfbf);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
     }
 
-    /* Container */
-    .container {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 0 16px 60px;
+    .file-item {
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.15s ease;
     }
 
-    /* Sections */
-    .section-title {
-        margin: 45px 0 18px;
-        font-size: 1.15em;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        opacity: 0.75;
-    }
-
-    /* Entry card */
-    .entry {
-        background: rgba(255, 255, 255, 0.035);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 12px;
-        padding: 18px 22px;
-        margin-bottom: 14px;
-        backdrop-filter: blur(6px);
-        box-shadow: 0 3px 14px rgba(0, 0, 0, 0.35);
-        transition: background 0.25s ease, transform 0.18s ease;
-    }
-
-    .entry:hover {
-        background: rgba(255, 255, 255, 0.06);
+    .file-item:hover {
+        background: rgba(255,255,255,0.1);
         transform: translateY(-2px);
     }
 
-    .entry-title {
-        font-size: 1.25em;
-        font-weight: 600;
+    .file-item.active {
+        background: rgba(255,255,255,0.15);
+        border-color: #fff2;
     }
 
-    .entry-desc {
-        margin-top: 4px;
-        font-size: 0.9em;
-        opacity: 0.85;
+    /* Main content */
+    #content {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 35px;
+        background: linear-gradient(180deg, #050505 0%, #000 100%);
+    }
+
+    #content pre, #content code {
+        background: #111 !important;
+        color: #ccc !important;
+        padding: 8px;
+        border-radius: 6px;
+        overflow-x: auto;
     }
 
     #loading {
-        text-align: center;
-        margin-top: 40px;
-        opacity: 0.7;
-        font-size: 1.05em;
+        opacity: 0.6;
+        font-size: 1.1em;
     }
-</style>
 
+    a { color: #98b9ff; }
+</style>
 </head>
+
 <body>
 
-<header>
-    <h1>AUT-3 Documentation</h1>
-</header>
+<div id="sidebar">
+    <h2>AUT-3 Docs</h2>
+    <div id="fileList">Loading…</div>
+</div>
 
-<div class="container" id="glossary">
-    <div id="loading">Loading repository contents…</div>
+<div id="content">
+    <div id="loading">Select a document from the left.</div>
 </div>
 
 <script>
-/* Repo info */
 const owner = "dustindwayne";
 const repo = "aut-3";
 
-/* Known descriptions */
-const descriptions = {
-    "AUT3_Defensive_Publication.md": "Primary architecture documentation for the AUT-3 photonic compute-memory system.",
-    "CLPSR_Addendum.md": "Closed-Loop Photonic State Restoration — AUT-3 self-healing voxel correction system.",
-    "TwoSided_I-O_Addendum.md": "Bidirectional optical I/O — dual-side write/read for deeper access and greater stability.",
-    "AUT3_Master_Specification.md": "High-level master spec describing architecture, logic flow, compute model, and operational behavior."
-};
+/* Fetch the repo tree */
+async function loadFileList() {
+    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/main?recursive=1`);
+    const data = await res.json();
 
-/* Known “core” documents */
-const coreDocs = new Set(Object.keys(descriptions));
+    const fileList = document.getElementById("fileList");
+    fileList.innerHTML = "";
 
-async function loadRepo() {
-    const glossary = document.getElementById("glossary");
-    const loading = document.getElementById("loading");
-
-    try {
-        const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/main?recursive=1`);
-        const data = await res.json();
-        loading.remove();
-
-        /* Create section structure */
-        const coreSection = document.createElement("div");
-        const otherSection = document.createElement("div");
-
-        /* Section titles */
-        coreSection.innerHTML = `<div class="section-title">Core AUT-3 Documents</div>`;
-        otherSection.innerHTML = `<div class="section-title">Repository Files</div>`;
-
-        data.tree
-            .filter(item => item.type === "blob")
-            .forEach(file => {
-                const name = file.path.split("/").pop();
-
-                const entry = document.createElement("div");
-                entry.className = "entry";
-
-                entry.innerHTML = `
-                    <div class="entry-title">${name}</div>
-                    <div class="entry-desc">${
-                        descriptions[name] 
-                        ? descriptions[name] 
-                        : "Repository file: " + file.path
-                    }</div>
-                `;
-
-                if (coreDocs.has(name)) coreSection.appendChild(entry);
-                else otherSection.appendChild(entry);
-            });
-
-        glossary.appendChild(coreSection);
-        glossary.appendChild(otherSection);
-
-    } catch (err) {
-        loading.textContent = "Error loading repository data.";
-        console.error(err);
-    }
+    data.tree
+        .filter(item => item.type === "blob" && item.path.endsWith(".md"))
+        .forEach(file => {
+            const div = document.createElement("div");
+            div.className = "file-item";
+            div.textContent = file.path;
+            div.onclick = () => loadFileContent(file.path, div);
+            fileList.appendChild(div);
+        });
 }
 
-loadRepo();
+/* Load file contents & render */
+async function loadFileContent(path, element) {
+    document.querySelectorAll(".file-item").forEach(e => e.classList.remove("active"));
+    element.classList.add("active");
+
+    const res = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/${path}`);
+    const text = await res.text();
+
+    // Convert markdown → HTML using GitHub API
+    const mdRes = await fetch("https://api.github.com/markdown", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+    });
+    const html = await mdRes.text();
+
+    document.getElementById("content").innerHTML = html;
+}
+
+/* Init */
+loadFileList();
 </script>
 
 </body>
