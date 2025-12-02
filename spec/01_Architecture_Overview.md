@@ -1,59 +1,98 @@
 # 1. Architecture Overview — AUT-3
 
-## 1.1 Purpose
+AUT-3 is a complete computing architecture in which the entire machine—
+compute, memory, cache, GPU, and storage—is implemented inside a unified
+three-dimensional photonic medium. The architecture eliminates the classical
+CPU/GPU/RAM/VRAM/SSD hierarchy. All operations occur optically within a
+volumetric compute–memory substrate defined by wavelength-selective behavior.
 
-AUT-3 defines a class of computing systems where:
+A minimal digital shell is used only for:
+- driving lasers and emitters
+- photodiode readout
+- safety interlocks
+- I/O with external systems
 
-- **State** is stored as optical properties distributed inside a **3D volume**.
-- **Computation** occurs when controlled light fields propagate through that volume.
-- **Readout** reconstructs the volumetric state using optical sensing.
+The digital shell does not act as a CPU. No workload execution occurs outside the photonic volume.
 
-The same physical volume acts as both **memory** and **compute substrate**. AUT-3 does not separate CPU, RAM, cache, and storage into distinct devices. These roles are implemented as **modes of interaction** with different regions and channels of the volumetric medium.
+---
 
-## 1.2 High-Level Concept
+## 1.1 Core Principles
 
-An AUT-3 cube is a node with:
+1. **Unified Substrate**  
+   AUT-3 merges compute, memory, cache, and long-term storage into one
+   volumetric optical medium.
 
-- A volumetric medium whose internal voxels carry a continuous state vector.
-- One or more **write planes** that inject structured optical fields.
-- One or more **read planes** (laser + sensor) that reconstruct internal state.
-- Local electronics that coordinate write, read, and control.
+2. **DWDM Functional Separation**  
+   Dense Wavelength Division Multiplexing gives each wavelength band a
+   functional role:
+   - Red/IR → Deep Storage
+   - Green → RAM / Working Memory
+   - Blue/UV → Compute / Logic
 
-At the system level, nodes are connected into a mesh. The mesh exposes a single logical compute–memory fabric.
+3. **Femtosecond Compute Operation (<100 fs)**  
+   Compute pulses occur faster than lattice relaxation, enabling nonlinear
+   operations without thermal deformation.
 
-## 1.3 Comparison to Classical Architecture
+4. **3D Volumetric Readout**  
+   State is reconstructed through tomographic imaging using multi-band
+   photodiodes and probe-beam scanning.
 
-Classical systems:
+5. **Closed-Loop Wavelength Locking**  
+   Thermal drift causes refractive-index shifts; AUT-3 compensates by dynamically
+   retuning emitter wavelengths.
 
-- CPU performs computation on registers.
-- Cache and RAM store near-term state.
-- Storage devices retain long-term state.
-- Buses move data between these components.
+6. **Optional Z-Selective Gating**  
+   Physical or electro-optical gating layers allow depth-restricted writes when
+   additional safety or separation is desired.
 
-Key differences in AUT-3:
+7. **Mesh Scaling**  
+   Multiple AUT-3 nodes can be tiled into a volumetric compute fabric.
 
-- No separate CPU: the volume itself performs computation when driven optically.
-- No separate RAM/cache/storage devices: regions and channels of the same medium behave as different tiers of memory.
-- Data movement is minimized: operations are applied **in place**, without shuttling bits to a separate processor.
+---
 
-## 1.4 Design Goals
+## 1.2 AUT-3 as a Total System Replacement
 
-AUT-3 is designed with the following goals:
+AUT-3 replaces:
 
-- **Unified substrate** for compute and memory.
-- **Volumetric scaling**: capacity and compute scale with volume, not just area.
-- **High parallelism**: many voxels updated or observed in a single optical operation.
-- **Wavelength and direction multiplexing**: different roles (storage, RAM, cache, compute) can share the same space using different optical channels.
-- **Modularity**: cubes can be combined into larger systems.
-- **Material independence**: specification does not depend on a single medium; it defines requirements that multiple materials could satisfy.
+- CPU execution units  
+- GPU shader/tensor cores  
+- RAM and VRAM  
+- L1/L2/L3 cache  
+- SSD/HDD/NVM storage  
 
-## 1.5 Out of Scope
+All of these become optical state at different wavelengths and depths within the
+same medium.
 
-The AUT-3 specification does not:
+---
 
-- Prescribe a single chemical or physical medium.
-- Define a software API or programming language.
-- Guarantee specific performance numbers.
-- Claim biological or cognitive properties.
+## 1.3 Elimination of Data Movement
 
-It defines the **architecture**, state model, and interaction patterns that make volumetric photonic compute–memory systems feasible and analyzable.
+In conventional computers, performance is limited by:
+
+- CPU ↔ RAM transfer
+- GPU ↔ VRAM transfer
+- CPU ↔ GPU PCIe transfer
+- RAM ↔ SSD transfer
+
+AUT-3 eliminates this entirely:
+**data never moves; computation moves to the data via optical fields.**
+
+---
+
+## 1.4 Execution Model Summary
+
+- Compute occurs via Blue/UV pulses interacting with voxel state.
+- RAM values reside in Green working-depth layers.
+- Long-term data occupies Red/IR deep layers.
+- The digital shell issues optical operations but does not compute.
+
+---
+
+## 1.5 Summary Statement
+
+AUT-3 is not a processor or memory device.  
+AUT-3 *is the computer*.
+
+All compute and memory roles arise from wavelength-selective interaction of
+optical fields with a volumetric medium.  
+No classical architecture elements remain.
