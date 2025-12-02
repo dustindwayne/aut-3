@@ -4,87 +4,55 @@
 
 The control plane coordinates:
 
-- Configuration of emitters and probe systems.
-- Scheduling of compute and memory operations.
-- Dataflow between AUT-3 cubes and any external digital systems.
-- Monitoring of health and performance metrics.
+- Emitter configuration
+- Compute-field scheduling
+- Tomographic readout
+- Node-to-node communication
+- Thermal and wavelength stability
 
-Control logic can be split between:
+## 6.2 Closed-Loop Wavelength Locking (Thermal Drift Compensation)
 
-- Local controllers on each cube (MCUs, FPGAs, ASICs).
-- A higher-level host or supervisory processor.
+AUT-3 operates under conditions where:
 
-## 6.2 Operation Description
+- Optical power
+- Local heating
+- Refractive-index changes
 
-An AUT-3 operation can be described minimally by:
+can cause **spectral drift** in the medium.
 
-- Target region(s) in the voxel grid.
-- Target channel(s) in the state vector.
-- Optical field configuration:
-  - Emitter patterns.
-  - Wavelength selection.
-  - Intensity and timing.
-- Readout specification (if any):
-  - Which projections to acquire.
-  - Whether to reconstruct state.
-- Dependencies on previous operations.
+To maintain deterministic addressing, AUT-3 uses **Closed-Loop Wavelength Locking**, defined as:
 
-At a low level, this can be encoded as an instruction-like structure understood by cube firmware.
+1. Sensors detect **local refractive index drift** via probe measurements.  
+   (Example: storage channel absorption peak shifts from 1310 nm → 1312 nm)
+2. Firmware computes the offset:  
+   `Δλ = λ_actual - λ_nominal`
+3. Emitters dynamically retune their wavelength by the same Δλ.  
+   Example:  
+   - Medium drifts **+2 nm**  
+   - Laser retunes **+2 nm**
+4. Operation continues without thermal failure or logical corruption.
 
-## 6.3 Instruction-Level Interface (Conceptual)
+This replaces aggressive cooling with **active wavelength tracking**, maintaining channel integrity during compute and write operations.
 
-A conceptual instruction format might include:
+## 6.3 Operation Description
 
-- `OP_TYPE` — write, compute, read, combined.
-- `REGION` — coordinates of affected voxels.
-- `CHANNEL_MASK` — which state components to act on.
-- `FIELD_CONFIG` — identifier or parameters for optical field.
-- `DURATION` — exposure time or number of cycles.
-- `READ_FLAGS` — whether to capture projections and/or reconstruct.
-- `SYNC_FLAGS` — dependency and ordering information.
+Each instruction describes:
 
-The specification does not fix a concrete ISA. It defines the kinds of parameters needed for any AUT-3 instruction set.
+- Region
+- Channel mask (via DWDM)
+- Field configuration
+- Exposure duration
+- Readout mode
 
 ## 6.4 Programming Abstractions
 
-Higher-level programming models can expose AUT-3 as:
-
-- A tensor/field compute device:
-  - Operations describe nonlinear transforms over large tensors.
-- An accelerator for specific workloads:
-  - APIs designed around matrix multiplications, convolutions, or other kernels.
-- A general-purpose compute fabric:
-  - Graph-based models where nodes are operations and edges represent data dependencies.
-
-In all cases, the compiler or runtime is responsible for:
-
-- Mapping abstract operations to specific sequences of AUT-3 instructions.
-- Choosing where in the volumetric medium to place data and temporary state.
+Can be exposed as tensor ops, field ops, or graph-based scheduling.
 
 ## 6.5 Synchronization and Consistency
 
-AUT-3 operations may:
+Control firmware ensures non-overlapping writes and ordered reads.
 
-- Run in parallel on different regions.
-- Overlap in time if they do not conflict.
+## 6.6 Integration With Digital Systems
 
-Control logic ensures:
+The node exposes queues for commands, results, and health metrics including **wavelength drift state**.
 
-- No two operations write to the same voxel state simultaneously.
-- Reads observe consistent states as defined by the programming model.
-
-For certain workloads, relaxed consistency models may be acceptable and can increase throughput.
-
-## 6.6 Integration with Digital Systems
-
-Digital systems interact with AUT-3 via:
-
-- Configuration registers or command queues.
-- DMA-like mechanisms for transferring input/output tensors.
-- Status and event interfaces.
-
-Practical implementations may expose AUT-3 as:
-
-- A device on a high-speed bus (e.g., PCIe-like).
-- A coherent accelerator in a shared memory fabric.
-- A standalone system with a minimal control CPU used primarily for orchestration.
