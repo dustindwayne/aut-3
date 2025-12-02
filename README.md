@@ -32,7 +32,6 @@ The specification is written to be:
 - `AUT3_Master_Specification.md` — consolidated specification (single-file view)
 - `spec/` — modular specification chapters
 - `defensive-publication/AUT3_Defensive_Publication.md` — formal defensive publication text
-- `license/` — licensing notes
 
 ---
 
