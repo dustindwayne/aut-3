@@ -2,67 +2,51 @@
 
 ## 11.1 Candidate Media
 
-Potential classes of media for AUT-3 include:
+Media must tolerate:
 
-- Photochromic polymers and glasses.
-- Phase-change materials (e.g., chalcogenides) in volumetric form.
-- Photorefractive crystals.
-- Doped sol–gel materials.
-- Electro-optic or nonlinear optical polymers.
+- High peak optical intensity
+- Minimal thermal expansion
+- Fast relaxation times
 
-Selection criteria:
+Candidates include photorefractive crystals, doped sol–gels, volumetric chalcogenides, etc.
 
-- Ability to change optical properties under illumination.
-- Endurance and retention suitable for the intended memory tier.
-- Compatibility with chosen wavelengths.
-- Fabrication viability at required volumes and resolutions.
+## 11.2 Ultrafast Optics Requirement (Femtosecond Regime)
 
-## 11.2 Optical Subsystems
+AUT-3 requires emitter systems capable of operating in the **femtosecond pulse regime (<100 fs)**.
 
-Implementation choices for optical subsystems:
+### Rationale
 
-- Emitters:
-  - Micro-LED arrays.
-  - VCSEL arrays.
-  - Other integrated photonic sources.
-- Sensors:
-  - CMOS or CCD arrays.
-  - Integrated photonic detectors where applicable.
-- Optics:
-  - Simple lens systems where possible to reduce complexity.
-  - Optional adaptive optics or diffractive elements for precise field shaping.
+- Energy is delivered **faster than the lattice relaxation time**, avoiding:
+  - Thermal Blooming  
+  - Melt-induced rewrites  
+  - Irreversible refractive index deformation  
+- Compute pulses can perform nonlinear interactions without heating the bulk medium.
 
-## 11.3 Control Electronics
+This requirement dramatically increases the stability of the storage channels while allowing high-intensity compute pulses.
 
-Local control electronics may include:
+## 11.3 Optical Subsystems
 
-- FPGAs or ASICs for timing-critical control of emitters and sensors.
-- Embedded processors for calibration and management.
-- High-speed serial links for interfacing with external hosts or other nodes.
+Emitters may include:
 
-## 11.4 Thermal Management
+- Femtosecond fiber lasers
+- Ultrafast micro-LED stacks
+- Tunable DWDM-capable diode arrays
 
-Photonic and material processes generate heat:
+Sensors must handle multi-band probe reconstruction.
 
-- Designs must include heat spreading and dissipation strategies.
-- Thermal limits may constrain the maximum duty cycle of intensive operations.
-- Thermal sensors and feedback can be used to adjust workloads dynamically.
+## 11.4 Control Electronics
 
-## 11.5 Prototyping Considerations
+Controllers track:
 
-Initial proof-of-concept systems can:
+- Wavelength drift (for locking)
+- Pulse energy
+- Thermal envelope
 
-- Use lower-resolution voxel grids.
-- Focus on demonstrating:
-  - Reliable write and read cycles.
-  - Simple compute operations over small regions.
-- Use off-the-shelf components:
-  - Laboratory lasers.
-  - Standard optics.
-  - Commercial image sensors.
+## 11.5 Thermal Management
 
-Successive prototypes can:
+Cooling is secondary to active compensation.  
+Closed-loop wavelength locking handles refractive drift without the need for cryogenic or aggressive solutions.
 
-- Increase resolution and volume.
-- Integrate optics and electronics more tightly.
-- Explore additional wavelengths and roles.
+## 11.6 Prototyping Notes
+
+Prototyping may start with picosecond systems but long-term implementations must use femtosecond-capable lasers to avoid thermal deformation under repeated compute cycles.
