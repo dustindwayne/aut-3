@@ -1,69 +1,88 @@
 # 3. State Model — AUT-3
 
-## 3.1 Voxel Grid
-
-The volumetric medium in each cube is abstracted as a voxel grid:
-
-- Dimensions: `Nx × Ny × Nz`
-- Coordinates `(x, y, z)` are integer indices
-- Voxel size/resolution is implementation-dependent
-
-The voxel grid is a conceptual representation; the underlying medium may be continuous, but control and reconstruction operate at voxel granularity.
-
-## 3.2 Voxel State Vector
-
-Each voxel has a state vector:
+AUT-3 represents all computation and memory as optical state stored inside a
+volumetric grid of voxels. Each voxel contains a multi-component vector:
 
 `S(x, y, z) ∈ ℝ^K`
 
-Components correspond to optical properties such as:
+Components represent:
+- wavelength-specific absorption  
+- phase response  
+- refractive index modification  
+- nonlinear interaction terms  
+- computed or stored values  
 
-- Absorption at specific wavelengths
-- Phase delay
-- Refractive index shift
-- Fluorescence components
-- Derived numerical features
+---
 
-The dimension `K` is chosen per implementation.
+## 3.1 DWDM-Based Functional Channels
 
-## 3.3 Functional Channels via Dense Wavelength Division Multiplexing (DWDM)
+The AUT-3 medium separates functionality by **wavelength**, not hardware:
 
-AUT-3 uses **Dense Wavelength Division Multiplexing (DWDM)** to assign stable functional roles to different spectral bands.  
-This solves the classical occlusion problem in volumetric optical systems.
+| Band           | Function            | Characteristics                                   |
+|----------------|----------------------|---------------------------------------------------|
+| **Red/IR**     | Storage              | Deep penetration; stable; minimal scattering      |
+| **Green**      | RAM / Working Memory | Moderate depth; rewritable; mid-level interaction |
+| **Blue/UV**    | Compute              | Shallow; nonlinear; high-energy femtosecond ops   |
 
-### **Spectral Role Allocation**
+The DWDM bands allow independent addressing of deep, mid, and shallow layers
+without mutual occlusion.
 
-| Spectral Band | Function | Rationale |
-|---------------|----------|-----------|
-| **Red / Infrared (≈700–1600 nm)** | **Static Storage (OS, files, long-term layers)** | Long absorption lengths + low scattering → ideal for reaching deep layers without disturbing upper RAM or compute regions. |
-| **Green / Visible (≈520–580 nm)** | **Active RAM (variables, working state)** | Stronger absorption + shorter penetration → ideal for mid-depth dynamic updates. |
-| **Blue / UV (≈350–480 nm)** | **Compute / Logic (tensor weights, transient compute fields)** | High-energy, shallow-interaction band suited for fast transient computation. |
+---
 
-### **Occlusion Avoidance**
+## 3.2 Occlusion-Free Depth Access
 
-DWDM ensures that:
+Red/IR wavelengths pass through Green and Blue without disturbing them.
+Green operates in a mid-band and does not touch Red/IR layers.
+Blue/UV interacts only at shallow depth.
 
-- **Storage-layer wavelengths (Red/IR)** pass *through* RAM and Compute regions because those layers do not significantly absorb in the Red/IR band.
-- **RAM wavelengths (Green)** operate in a middle band that does not interfere with storage or compute channels.
-- **Compute wavelengths (Blue/UV)** operate at shallow depth and do not disturb deep storage layers.
+This eliminates the need for physical blockers for most use cases.
 
-This allows **independent addressing of layered behaviors** without voxel shadowing or inter-layer signal blocking.
+---
+
+## 3.3 Optional Z-Gating Variant
+
+Although DWDM solves depth-selective interaction, AUT-3 includes optional
+Z-gating mechanisms:
+
+- switchable transparency films  
+- replaceable separators  
+- nonlinear gating layers  
+- write-limiter barriers  
+
+These provide additional safety or redundancy for high-energy environments.
+
+---
 
 ## 3.4 State Evolution
 
 Voxel state evolves through:
+- DWDM-targeted writes  
+- femtosecond compute pulses  
+- field propagation  
+- natural relaxation (material-dependent)  
 
-- Write operations (DWDM-targeted updates)
-- Compute-field interactions
-- Natural drift and relaxation (material-dependent)
+The digital shell schedules field events but does not compute.
 
-Firmware ensures refresh where required.
+---
 
-## 3.5 Observability
+## 3.5 Readout Fields
 
-Probe lasers operate in a **non-conflicting wavelength band**, ensuring readout does not disturb stored DWDM channels.
+A 3D read laser array acquires:
+- multi-angle projections  
+- multi-wavelength absorption samples  
+- phase/delay information  
 
-## 3.6 Logical Addressing
+Reconstruction yields the full state vector field across the volume.
 
-Logical addressing maps structured data (fields, tensors) to voxel subsets.  
-DWDM bands ensure channel separation independent of physical voxel adjacency.
+---
+
+## 3.6 Logical Data Mapping
+
+Since storage, RAM, and compute are all spectral roles in the same volume:
+
+- logical variables map to Green-layer voxels  
+- tensors map to volumetric regions in Blue/UV  
+- long-term structures map to Red/IR regions  
+- ephemeral compute caches exist as Blue shallow fields  
+
+This eliminates all device boundaries.
