@@ -3,81 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <title>AUT-3 Documentation Index</title>
+
 <style>
-    /* --- Global --- */
     body {
         margin: 0;
-        padding: 0;
         background:
-            radial-gradient(circle at 30% 10%, #0f0f0f 0%, #050505 60%, #000 100%);
+            radial-gradient(circle at 25% 15%, #101010 0%, #050505 70%),
+            linear-gradient(180deg, #000 0%, #0a0a0a 100%);
         font-family: "Inter", "Segoe UI", Roboto, sans-serif;
         color: #eaeaea;
-        line-height: 1.6;
-        -webkit-font-smoothing: antialiased;
+        line-height: 1.55;
     }
 
-    /* --- Header --- */
+    /* Header */
     header {
-        padding: 60px 20px 40px;
+        padding: 50px 16px 30px;
         text-align: center;
     }
     h1 {
         margin: 0;
-        font-size: 2.8em;
+        font-size: 2.4em;
         font-weight: 600;
         background: linear-gradient(90deg, #fff, #bfbfbf);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        letter-spacing: 1.2px;
     }
 
-    /* --- Container --- */
+    /* Container */
     .container {
-        max-width: 960px;
+        max-width: 900px;
         margin: 0 auto;
-        padding: 20px;
+        padding: 0 16px 60px;
     }
 
-    /* --- Entry card --- */
+    /* Sections */
+    .section-title {
+        margin: 45px 0 18px;
+        font-size: 1.15em;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        opacity: 0.75;
+    }
+
+    /* Entry card */
     .entry {
-        background: rgba(255, 255, 255, 0.04);
+        background: rgba(255, 255, 255, 0.035);
         border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 14px;
-        padding: 22px 26px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+        border-radius: 12px;
+        padding: 18px 22px;
+        margin-bottom: 14px;
         backdrop-filter: blur(6px);
-        transition: transform 0.18s ease, background 0.25s ease;
+        box-shadow: 0 3px 14px rgba(0, 0, 0, 0.35);
+        transition: background 0.25s ease, transform 0.18s ease;
     }
 
     .entry:hover {
-        transform: translateY(-3px);
-        background: rgba(255, 255, 255, 0.07);
+        background: rgba(255, 255, 255, 0.06);
+        transform: translateY(-2px);
     }
 
     .entry-title {
-        font-size: 1.4em;
+        font-size: 1.25em;
         font-weight: 600;
-        margin-bottom: 6px;
-        color: #ffffff;
     }
 
     .entry-desc {
-        font-size: 0.95em;
-        color: #cccccc;
-        opacity: 0.9;
+        margin-top: 4px;
+        font-size: 0.9em;
+        opacity: 0.85;
     }
 
-    /* Loading state */
     #loading {
         text-align: center;
-        margin-top: 60px;
+        margin-top: 40px;
         opacity: 0.7;
-        font-size: 1.15em;
-        letter-spacing: 0.5px;
+        font-size: 1.05em;
     }
-
 </style>
+
 </head>
 <body>
 
@@ -90,19 +94,21 @@
 </div>
 
 <script>
-// Repo info
+/* Repo info */
 const owner = "dustindwayne";
 const repo = "aut-3";
 
-// Known descriptions
+/* Known descriptions */
 const descriptions = {
-    "AUT3_Defensive_Publication.md": "Primary architecture documentation for the AUT-3 volumetric photonic compute-memory system.",
-    "CLPSR_Addendum.md": "Closed-Loop Photonic State Restoration — defines AUT-3 self-healing voxel correction.",
-    "TwoSided_I-O_Addendum.md": "Two-sided bidirectional read/write addendum for improved depth access and stability.",
-    "AUT3_Master_Specification.md": "High-level master specification describing architecture, logic flow, and compute model."
+    "AUT3_Defensive_Publication.md": "Primary architecture documentation for the AUT-3 photonic compute-memory system.",
+    "CLPSR_Addendum.md": "Closed-Loop Photonic State Restoration — AUT-3 self-healing voxel correction system.",
+    "TwoSided_I-O_Addendum.md": "Bidirectional optical I/O — dual-side write/read for deeper access and greater stability.",
+    "AUT3_Master_Specification.md": "High-level master spec describing architecture, logic flow, compute model, and operational behavior."
 };
 
-// Load repo file list
+/* Known “core” documents */
+const coreDocs = new Set(Object.keys(descriptions));
+
 async function loadRepo() {
     const glossary = document.getElementById("glossary");
     const loading = document.getElementById("loading");
@@ -112,6 +118,14 @@ async function loadRepo() {
         const data = await res.json();
         loading.remove();
 
+        /* Create section structure */
+        const coreSection = document.createElement("div");
+        const otherSection = document.createElement("div");
+
+        /* Section titles */
+        coreSection.innerHTML = `<div class="section-title">Core AUT-3 Documents</div>`;
+        otherSection.innerHTML = `<div class="section-title">Repository Files</div>`;
+
         data.tree
             .filter(item => item.type === "blob")
             .forEach(file => {
@@ -120,20 +134,21 @@ async function loadRepo() {
                 const entry = document.createElement("div");
                 entry.className = "entry";
 
-                const title = document.createElement("div");
-                title.className = "entry-title";
-                title.textContent = name;
+                entry.innerHTML = `
+                    <div class="entry-title">${name}</div>
+                    <div class="entry-desc">${
+                        descriptions[name] 
+                        ? descriptions[name] 
+                        : "Repository file: " + file.path
+                    }</div>
+                `;
 
-                const desc = document.createElement("div");
-                desc.className = "entry-desc";
-                desc.textContent = descriptions[name]
-                    ? descriptions[name]
-                    : `Repository file: ${file.path}`;
-
-                entry.appendChild(title);
-                entry.appendChild(desc);
-                glossary.appendChild(entry);
+                if (coreDocs.has(name)) coreSection.appendChild(entry);
+                else otherSection.appendChild(entry);
             });
+
+        glossary.appendChild(coreSection);
+        glossary.appendChild(otherSection);
 
     } catch (err) {
         loading.textContent = "Error loading repository data.";
