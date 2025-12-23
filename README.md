@@ -24,13 +24,6 @@ AUT-3 uses:
 
 This repository provides the full **architecture specification** and a **defensive publication** describing AUT-3 in sufficient detail for research, prototyping, and prior-art protection.
 
-The specification is:
-- Mechanically precise  
-- Engineering-focused  
-- Free of hype  
-- Independent of specific materials  
-- Written for long-term feasibility  
-
 ---
 
 ## Document Structure
